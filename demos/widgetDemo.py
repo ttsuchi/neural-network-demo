@@ -10,12 +10,13 @@ class widgetDemo(App):
 
     def build(self):
         layout = GridLayout(cols=1)
-        for i in range(3):
-            btn = Button(text=str(i), size_hint_y=None, height=40)
-            layout.add_widget(btn)
+        btn = Button(text='Example',width=100,height=40)
+        layout.add_widget(btn)
         layout.add_widget(Slider(min=-100, max=100, value=25))
         layout.add_widget(Image(source='diagram.png'))
         return layout
+    def callback():
+        print 'The button is being pressed.'
 
 if __name__ == '__main__':
     widgetDemo().run()
