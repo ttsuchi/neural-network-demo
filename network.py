@@ -18,8 +18,17 @@ class network(App):
             pos_hint={'x':.2, 'center_y': .98}))
         layout.add_widget(Label(text='Actual Representation', size_hint=(.2,.1),
             pos_hint={'x':.38, 'center_y': .98}))
+        layout.add_widget(Label(text='Networks Representation', size_hint=(.2,.1),
+            pos_hint={'x':.60, 'center_y': .98}))
+
+
+
 
         #First column: Actual image
+        #First column: Actual image
+        #First column: Actual image
+        #First column: Actual image
+        
         layout.add_widget(Image(source='face1.png',pos=(-300,200)))
         layout.add_widget(Image(source='face2.png',pos=(-300,25)))
 
