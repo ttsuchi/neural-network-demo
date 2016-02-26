@@ -25,7 +25,9 @@ class numComponentsSelect(FloatLayout):
     def __init__(self, **kwargs):
         super(numComponentsSelect, self).__init__(**kwargs)
         self.numComponents = Label(text='Number of components:  ',pos=(0,250))
-        #self.numComponents.bind(value=self.sliderChange)
+        # this line doesn't seem to do anything but the binding doesn't work
+        # without it
+        self.numComponents.text = 'Number of components: '
         compSlider = Slider(min=1, max=109,value=25,pos=(0,200))
         compSlider.bind(value=self.sliderChange)
         self.add_widget(self.numComponents)
@@ -34,15 +36,17 @@ class numComponentsSelect(FloatLayout):
         # after images
         layout = FloatLayout()
         self.before1 = Image(source='face1.png',pos=(-300,100))
+        #self.before1.source = 'face1.png'
         self.before2 = Image(source='face2.png',pos=(-170,100))
+        #self.before2.source = 'face2.png'
         layout.add_widget(self.before1)
         layout.add_widget(self.before2)
         self.add_widget(layout)
 
     def sliderChange(instance,obj,value):
-        instance.numComponents = Label(text=('Number of components: ' + str(round(value))))
-        instance.before1 = Image(source='face1.png')
-        instance.before2 = Image(source='face2.png')
+        instance.numComponents.text = 'Number of components: ' + str(int(value))
+        instance.before1.source='face2.png'
+        instance.before2.source='face1.png'
         instance.numComponents.canvas.ask_update()
         instance._trigger_layout()
 
