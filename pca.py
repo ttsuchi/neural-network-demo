@@ -25,8 +25,8 @@ class numComponentsSelect(FloatLayout):
     def __init__(self, **kwargs):
         super(numComponentsSelect, self).__init__(**kwargs)
         self.numComponents = Label(text='Number of components:  ',pos=(0,250))
-        # this line doesn't seem to do anything but the binding doesn't work
-        # without it
+        ''' this line doesn't seem to do anything but the binding doesn't work
+         without it ''' 
         self.numComponents.text = 'Number of components: '
         compSlider = Slider(min=1, max=109,value=25,pos=(0,200))
         compSlider.bind(value=self.sliderChange)
@@ -35,9 +35,9 @@ class numComponentsSelect(FloatLayout):
 
         # after images
         layout = FloatLayout()
-        self.before1 = Image(source='face1.png',pos=(-300,100))
+        self.before1 = Image(source='face1.png',pos=(-300,-100))
         #self.before1.source = 'face1.png'
-        self.before2 = Image(source='face2.png',pos=(-170,100))
+        self.before2 = Image(source='face2.png',pos=(-170,-100))
         #self.before2.source = 'face2.png'
         layout.add_widget(self.before1)
         layout.add_widget(self.before2)
@@ -58,8 +58,8 @@ class beforeImages(FloatLayout):
     def __init__(self, **kwargs):
         super(beforeImages, self).__init__(**kwargs)
         #self.rows=1
-        self.add_widget(Image(source='face1.png',pos=(-300,-100)))
-        self.add_widget(Image(source='face2.png',pos=(-170,-100)))
+        self.add_widget(Image(source='face1.png',pos=(-300,100)))
+        self.add_widget(Image(source='face2.png',pos=(-170,100)))
 
 
 class pcaGraph(FloatLayout):
