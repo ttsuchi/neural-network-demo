@@ -21,8 +21,9 @@ class selectingDataSet(App):
 
         #instantiate the labels
         title = Label(text="Select one of the data sets to load images",font_size=30, pos_hint={'x': 0, 'center_y': .9})
-        cafeDescription = Label(text="*CAFE Description Here*", font_size=15, pos_hint={'x': -.2, 'center_y': .5})
-        pofaDescription = Label(text="*POFA Description Here*", font_size=15, pos_hint={'x': .2, 'center_y': .5})
+        cafeDescription = Label(text="CA (California) Facial Expressions: images of facial expressions
+                aligned and normalized", font_size=15, pos_hint={'x': -.2, 'center_y': .5})
+        pofaDescription = Label(text="Pictures of Facial Affect: images of standard facial expressions", font_size=15, pos_hint={'x': .2, 'center_y': .5})
 
         #add labels to the layout
         layout.add_widget(title)
