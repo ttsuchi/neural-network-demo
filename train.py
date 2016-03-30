@@ -7,10 +7,12 @@ from kivy.uix.slider import Slider
 from kivy.uix.image import Image
 from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
+from kivy.uix.screenmanager import Screen
 
-class train(App):
+class Train(Screen):
 
-    def build(self):
+    def __init__(self, **kwargs):
+        super(Train, self).__init__(**kwargs)
 
  #       textInput = TextInput(text = 'hello')
         
@@ -23,7 +25,9 @@ class train(App):
         layout.add_widget(Button(text='Train for identity', size_hint=(.2, .1), pos_hint={'center_x': .8, 'center_y': .83}))
         layout.add_widget(Button(text='Previous'
             , size_hint=(.2, .1), pos_hint={'x': .15, 'center_y': .15}))
-        layout.add_widget(Button(text='Train', size_hint=(.2, .1), pos_hint={'x': .6, 'center_y': .15}))
+        loadButton = Button(text='Train', size_hint=(.2, .1), pos_hint={'x': .6, 'center_y': .15})
+        layout.add_widget(loadButton)
+        loadButton.bind(on_press=self.changeScreens)
 
 
 
@@ -59,11 +63,13 @@ class train(App):
         #layout.add_widget(DropDown(size_hint=(.1, .1), pos_hint={'x': .8, 'center_y': .65}).add_widget(Label(text="1")))
 
 
-        return layout
+        self.add_widget(layout)
 
+    def changeScreens(self, obj):
+        self.manager.current = 'screen4'
 
     def callback():
         print 'button is being pressed.'
 
-if __name__ == '__main__':
-    train().run()
+#if __name__ == '__main__':
+ #   train().run()

@@ -8,17 +8,24 @@ from kivy.uix.image import Image
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.garden.graph import Graph, MeshLinePlot
+from kivy.uix.screenmanager import Screen
 
-class runPCA(App):
+class RunPCA(Screen):
 
-    def build(self):
+    def __init__(self, **kwargs):
+        super(RunPCA, self).__init__(**kwargs)
+
         layout = FloatLayout()
         layout.add_widget(beforeImages())
         layout.add_widget(numComponentsSelect())
         layout.add_widget(pcaGraph())
         nextBtn = Button(text='Next', size_hint=(.25,.1),pos=(300,30))
+        nextBtn.bind(on_press=self.changeScreens)
         layout.add_widget(nextBtn)
-        return layout
+        self.add_widget(layout)
+
+    def changeScreens(self, obj):
+        self.manager.current = 'screen3'
 
 class numComponentsSelect(FloatLayout):
 
@@ -75,6 +82,6 @@ class pcaGraph(FloatLayout):
         graph.add_plot(plot)
         self.add_widget(graph)
 
-if __name__ == "__main__":
-    runPCA().run()
+#if __name__ == "__main__":
+ #   runPCA().run()
 
