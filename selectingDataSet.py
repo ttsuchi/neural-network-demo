@@ -2,6 +2,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.uix.togglebutton import ToggleButton
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
 
@@ -13,8 +14,9 @@ class SelectingDataSet(Screen):
         layout = FloatLayout(cols=3, row_force_default=True, row_default_height=40)
 
         #instantiate the buttons
-        cafeButton = Button(text='CAFE', size_hint=(.2, .1), pos_hint={'x': .2, 'center_y': .6})
-        pofaButton = Button(text='POFA', size_hint=(.2, .1), pos_hint={'center_x': .7, 'center_y': .6})
+        cafeButton = ToggleButton(text='CAFE', group='dataset', size_hint=(.2, .1), pos_hint={'x': .2, 'center_y': .6})
+        pofaButton = ToggleButton(text='POFA', group='dataset', size_hint=(.2, .1), pos_hint={'center_x': .7, 'center_y': .6})
+        nextBtn = Button(text='Next', size_hint=(.25,.1),pos=(300,30))
         loadButton = Button(text='Load Images and Run PCA', size_hint=(.25, .15), pos_hint={'x': .75, 'y': 0})
 
         #add buttons to the layout
