@@ -19,23 +19,32 @@ class RunPCA(Screen):
         layout.add_widget(beforeImages())
         layout.add_widget(numComponentsSelect())
         layout.add_widget(pcaGraph())
-        nextBtn = Button(text='Next', size_hint=(.25,.1),pos=(300,30))
+        nextBtn = Button(text='Next', size_hint=(.25,.1),pos=(410,30))
         nextBtn.bind(on_press=self.changeScreens)
+        prevBtn = Button(text='Back', size_hint=(.25,.1),pos=(190,30))
+        prevBtn.bind(on_press=self.goBack)
         layout.add_widget(nextBtn)
+        layout.add_widget(prevBtn)
+        layout.add_widget(Label(text='Select the smallest number of components that retains most of the information.' \
+                , pos=(0,260)))
         self.add_widget(layout)
 
     def changeScreens(self, obj):
         self.manager.current = 'screen3'
 
+    def goBack(self, obj):
+        self.manager.current = 'screen1'
+
 class numComponentsSelect(FloatLayout):
 
     def __init__(self, **kwargs):
         super(numComponentsSelect, self).__init__(**kwargs)
-        self.numComponents = Label(text='Number of components:  ',pos=(0,250))
+        self.numComponents = Label(text='Number of components:  ',pos=(0,210))
         ''' this line doesn't seem to do anything but the binding doesn't work
          without it ''' 
-        self.numComponents.text = 'Number of components: '
-        compSlider = Slider(min=1, max=109,value=25,pos=(0,200))
+        #self.numComponents.text = 'Number of components: '
+        self.numComponents.text = self.numComponents.text
+        compSlider = Slider(min=1, max=109,value=25,pos=(0,180))
         compSlider.bind(value=self.sliderChange)
         self.add_widget(self.numComponents)
         self.add_widget(compSlider)
@@ -65,8 +74,8 @@ class beforeImages(FloatLayout):
     def __init__(self, **kwargs):
         super(beforeImages, self).__init__(**kwargs)
         #self.rows=1
-        self.add_widget(Image(source='face1.png',pos=(-300,100)))
-        self.add_widget(Image(source='face2.png',pos=(-170,100)))
+        self.add_widget(Image(source='face1.png',pos=(-300,60)))
+        self.add_widget(Image(source='face2.png',pos=(-170,60)))
 
 
 class pcaGraph(FloatLayout):
@@ -76,7 +85,7 @@ class pcaGraph(FloatLayout):
         graph = Graph(xLabel='X',ylabel='Y',x_ticks_minor=5, \
                 x_ticks_major=25,y_ticks_major=1,y_grid_label=True, \
                 x_grid_label=True,padding=5,x_grid=True,y_grid=True, \
-                xmin=-0,xmax=100,ymin=-1,size_hint=(.6,.6),pos=(300,130))
+                xmin=-0,xmax=100,ymin=-1,size_hint=(.5,.5),pos=(330,145))
         plot = MeshLinePlot(color=[1,0,0,1])
         plot.points = [(x,700/x) for x in range(1,101)]
         graph.add_plot(plot)
