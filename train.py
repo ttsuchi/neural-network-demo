@@ -14,8 +14,6 @@ class Train(Screen):
 
     def __init__(self, **kwargs):
         super(Train, self).__init__(**kwargs)
-
- #       textInput = TextInput(text = 'hello')
         
         # Main layout for gui
         layout = FloatLayout()
@@ -24,18 +22,21 @@ class Train(Screen):
         layout.add_widget(ToggleButton(text='Train for gender', group='training', size_hint=(.2, .1), pos_hint={'x': .1, 'center_y': .83}))
         layout.add_widget(ToggleButton(text='Train for expression', group='training', size_hint=(.2, .1), pos_hint={'x': .4, 'center_y': .83}))
         layout.add_widget(ToggleButton(text='Train for identity', group='training', size_hint=(.2, .1), pos_hint={'center_x': .8, 'center_y': .83}))
-        layout.add_widget(Button(text='Previous'
-            , size_hint=(.2, .1), pos_hint={'x': .15, 'center_y': .15}))
-        loadButton = Button(text='Train', size_hint=(.2, .1), pos_hint={'x': .6, 'center_y': .15})
+        backButton = Button(text='Back', size_hint=(.25, .1), pos=(190,30))
+        loadButton = Button(text='Train', size_hint=(.25, .1), pos=(410,30))
         layout.add_widget(loadButton)
+        layout.add_widget(backButton)
         loadButton.bind(on_press=self.changeScreens)
-
+        backButton.bind(on_press=self.goBack)
 
 
 
         #Labels and Input Text Boxes
+        self.hiddenUnits = 10;
         layout.add_widget(Label(text="# of hidden units", size_hint=(.2, .1), pos_hint={'x': .1, 'center_y': .65}))
-        layout.add_widget(TextInput(text='10', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .65}))
+        hiddenUnitsInput = TextInput(text='10', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .65}) 
+        layout.add_widget(hiddenUnitsInput)
+        hiddenUnitsInput.bind(on_text_validate=self.updateHiddenUnits)
 
 
         layout.add_widget(Label(text="# of validations", size_hint=(.2, .1), pos_hint={'x': .1, 'center_y': .55}))
@@ -61,16 +62,16 @@ class Train(Screen):
         layout.add_widget(TextInput(text='0.2', size_hint=(.07, .05), pos_hint={'x': .8, 'center_y': .35}))
 
 
-        #layout.add_widget(DropDown(size_hint=(.1, .1), pos_hint={'x': .8, 'center_y': .65}).add_widget(Label(text="1")))
-
-
         self.add_widget(layout)
 
     def changeScreens(self, obj):
         self.manager.current = 'screen4'
 
-    def callback():
-        print 'button is being pressed.'
+    def goBack(self,obj):
+        self.manager.current = 'screen2'
+
+    def updateHiddenUnits(self,obj,value):
+        self.hiddenUnits = value;
 
 #if __name__ == '__main__':
  #   train().run()
