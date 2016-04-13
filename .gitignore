@@ -64,3 +64,6 @@ target/
 
 *un~
 .swp
+.py~
+.*~
+*~
