@@ -32,21 +32,29 @@ class Train(Screen):
 
 
         #Labels and Input Text Boxes
-        self.hiddenUnits = 10;
+        self.hiddenUnits = 10
         layout.add_widget(Label(text="# of hidden units", size_hint=(.2, .1), pos_hint={'x': .1, 'center_y': .65}))
         hiddenUnitsInput = TextInput(text='10', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .65}) 
         layout.add_widget(hiddenUnitsInput)
         hiddenUnitsInput.bind(on_text_validate=self.updateHiddenUnits)
 
-
+        self.numValid = 0
         layout.add_widget(Label(text="# of validations", size_hint=(.2, .1), pos_hint={'x': .1, 'center_y': .55}))
-        layout.add_widget(TextInput(text='0', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .55}))
+        numValidInput = TextInput(text='0', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .55})
+        layout.add_widget(numValidInput)
+        numValidInput.bind(on_text_validate=self.updateNumValid)
 
+        self.numTestData = 0
         layout.add_widget(Label(text="# of test data", size_hint=(.2, .1), pos_hint={'x': .1, 'center_y': .45}))
-        layout.add_widget(TextInput(text='0', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .45}))
+        numTestDataInput = TextInput(text='0', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .45})
+        layout.add_widget(numTestDataInput)
+        numValidInput.bind(on_text_validate=self.updateNumTestData)
         
+        self.hiddenUnitsLearningRate = 0.1
         layout.add_widget(Label(text="hidden units \n    learning rate", size_hint=(.2, .1), pos_hint={'x': .1, 'center_y': .35}))
-        layout.add_widget(TextInput(text='0.1', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .35}))
+        hiddenUnitsLearningRateInput = TextInput(text='0.1', size_hint=(.07, .05), pos_hint={'x': .3, 'center_y': .35})
+        layout.add_widget(hiddenUnitsLearningRateInput)
+        hiddenUnitsLearningRateInput.bind(on_text_validate=self.updateHiddenUnitsLearningRate)
 
 
         layout.add_widget(Label(text="output units \nlearning rate", size_hint=(.2, .1), pos_hint={'x': .6, 'center_y': .65}))
@@ -71,7 +79,16 @@ class Train(Screen):
         self.manager.current = 'screen2'
 
     def updateHiddenUnits(self,obj,value):
-        self.hiddenUnits = value;
+        self.hiddenUnits = value
+
+    def updateNumValid(self,obj,value):
+        self.numValid = value
+
+    def updateNumTestData(self,obj,value):
+        self.numTestData = value
+
+    def updateHiddenUnitsLearningRate(self,obj,value):
+        self.hiddenUnitsLearningRate = value
 
 #if __name__ == '__main__':
  #   train().run()
