@@ -9,6 +9,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.garden.graph import Graph, MeshLinePlot
 from kivy.uix.screenmanager import Screen
+from kivy.graphics import Line
 
 class RunPCA(Screen):
 
@@ -39,14 +40,19 @@ class numComponentsSelect(FloatLayout):
 
     def __init__(self, **kwargs):
         super(numComponentsSelect, self).__init__(**kwargs)
-        self.numComponents = Label(text='Number of components:   ',pos=(0,215))
+        self.numComponents = Label(text='Number of components: 25 ',pos=(0,215))
         ''' this line doesn't seem to do anything but the binding doesn't work
          without it ''' 
         self.numComponents.text = self.numComponents.text
         compSlider = Slider(min=1, max=109,value=25,pos=(55,190), size_hint=(.9,1))
+        compSlider.value = 25
         compSlider.bind(value=self.sliderChange)
         self.add_widget(self.numComponents)
         self.add_widget(compSlider)
+
+        # line for graph
+        with self.canvas:
+            Line(points=[450, 150, 450, 450], width=1)
 
         # after images
         layout = FloatLayout()
@@ -54,7 +60,7 @@ class numComponentsSelect(FloatLayout):
         self.before2 = Image(source='face2.png',pos=(-170,-110))
         layout.add_widget(self.before1)
         layout.add_widget(self.before2)
-        self.recLabel = Label(text='Reconstruction with 1 components', pos=(-235, -20))
+        self.recLabel = Label(text='Reconstruction with 25 components', pos=(-235, -20))
         self.add_widget(self.recLabel)
         self.add_widget(layout)
 
