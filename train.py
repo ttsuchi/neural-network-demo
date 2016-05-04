@@ -73,10 +73,10 @@ class Train(Screen):
         self.add_widget(layout)
 
     def changeScreens(self, obj):
-        self.manager.current = 'screen4'
+        App.get_running_app().go_next()
 
     def goBack(self,obj):
-        self.manager.current = 'screen2'
+        App.get_running_app().go_back()
 
     def updateHiddenUnits(self,obj,value):
         self.hiddenUnits = value
