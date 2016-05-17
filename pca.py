@@ -3,6 +3,7 @@ from kivy.garden.graph import Graph, MeshLinePlot
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.uix.screenmanager import Screen
+from kivy.graphics import Line
 
 kv = '''
 FloatLayout:
@@ -50,13 +51,14 @@ FloatLayout:
         x_grid: True
         xmin: 0
         xmax: app.maximum_pca_components
-        x_grid_label: True
+        x_grid_label:True
         x_ticks_minor: 5
-        x_ticks_major: 25
+        x_ticks_major: 10
         y_grid: True
         y_grid_label: True
-        ylabel: 'Variance provided by additinoal component'
-        y_ticks_major: 1
+        ylabel: 'Variance provided by additional component'
+        y_ticks_major: .5
+        y_ticks_minor: .1
         ymin: 0
         ymax: 1.0
         size_hint: (.55, .60)
@@ -73,13 +75,14 @@ FloatLayout:
         on_press: app.go_next()
     Label:
         text:
-            "Drag the slider to select the number of components you'd like to analyze.\\n" + \
+            " Drag the slider to select the number of components you'd like to analyze.\\n" + \
             "The more components you select, the more variance your dataset will have."
         pos: (0, 265)
 '''
 
 
 class PCAGraph(Graph):
+    firstline = True
     def __init__(self, **kwargs):
         super(PCAGraph, self).__init__(**kwargs)
         plot = MeshLinePlot(color=[1, 0, 0, 1])
@@ -90,7 +93,17 @@ class PCAGraph(Graph):
         # Now manually register line drawing when the pca_components change
         def on_pca_components(caller, value):
             Logger.info('Drawing %d' % value)
-            # TODO draw lines on the graph...
+            with self.canvas:
+                if self.firstline:
+                    self.line = Line(points=[445, 150, 445, 450], width=1)
+                    self.firstline = False
+                graph_width = 390.0
+                graph_zero = 365.0
+                width_one = graph_width / float(self.xmax) 
+                components_x = graph_zero + value*width_one
+                self.line.points=[components_x, 150, components_x, 450]
+                # this commented line goes across the bottom of the graph
+                # Line(points=[365, 150, 755, 150], width=1)
 
         App.get_running_app().bind(pca_components=on_pca_components)
 
