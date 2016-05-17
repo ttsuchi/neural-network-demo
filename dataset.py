@@ -14,7 +14,7 @@ FloatLayout:
         text: 'CAFE'
         on_press: app.dataset = 'CAFE'
         state: 'down' if app.dataset == 'CAFE' else 'normal'
-        pos_hint: { 'x': .2, 'center_y': .6 }
+        pos_hint: { 'x': .2, 'center_y': .5 }
 
     ToggleButton:
         group: 'select_dataset'
@@ -23,7 +23,7 @@ FloatLayout:
         text: 'POFA'
         on_press: app.dataset = 'POFA'
         state: 'down' if app.dataset == 'POFA' else 'normal'
-        pos_hint: {'center_x': .7, 'center_y': .6}
+        pos_hint: {'center_x': .7, 'center_y': .5}
 
     Button:
         text: 'Next'
@@ -32,28 +32,24 @@ FloatLayout:
         on_press: app.go_next()
 
     Label:
-        text: "Please select one of the data "
+        text: "Please select one of the data sets to load"
         font_size: 30
         pos_hint: {'x': 0, 'center_y': .8}
 
     Label:
-        text: "sets to load images and run PCA."
+        text: "images and run Principal Component Analysis."
         font_size: 30
         pos_hint: {'x': 0, 'center_y': .72}
 
     Label:
-        text:
-            'CA (California) Facial Expressions:\\n' + \
-            'images of facial expressions aligned and normalized'
+        text: 'CA (California) Facial Expressions'
         font_size: 15
-        pos_hint: {'x': -.2, 'center_y': .5}
+        pos_hint: {'x': -.2, 'center_y': .4}
 
     Label:
-        text:
-            'Pictures of Facial Affect:\\n' + \
-            'images of standard facial expressions'
+        text: 'Pictures of Facial Affect'
         font_size: 15
-        pos_hint: {'x': .2, 'center_y': .5}
+        pos_hint: {'x': .2, 'center_y': .4}
 '''
 
 
