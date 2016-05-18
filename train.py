@@ -1,15 +1,5 @@
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.togglebutton import ToggleButton
-from kivy.app import App
-from kivy.uix.slider import Slider
-from kivy.uix.image import Image
-from kivy.uix.dropdown import DropDown
-from kivy.uix.textinput import TextInput
-from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
+from kivy.uix.screenmanager import Screen
 
 kv = '''
 FloatLayout:
@@ -17,8 +7,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Gender'
         pos_hint: {'x':.1, 'center_y': .83}
-        on_press: app.training = 'gender'
-        state: 'down' if app.training == 'gender' else 'normal'
+        on_press: app.training = 'Gender'
+        state: 'down' if app.training == 'Gender' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
@@ -27,8 +17,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Expression'
         pos_hint: {'x': .4, 'center_y': .83}
-        on_press: app.training = 'expression'
-        state: 'down' if app.training == 'expression' else 'normal'
+        on_press: app.training = 'Expression'
+        state: 'down' if app.training == 'Expression' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
@@ -37,13 +27,11 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Identity'
         pos_hint: {'center_x': .8, 'center_y': .83}
-        on_press: app.training = 'identity'
-        state: 'down' if app.training == 'identity' else 'normal'
+        on_press: app.training = 'Identity'
+        state: 'down' if app.training == 'Identity' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
-
-
 
     Button:
         text: 'Train'
@@ -62,8 +50,8 @@ FloatLayout:
         text: '10'
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .65}
-        value: app.hiddenunits
-        on_text_validate: app.hiddenunits = self.value
+        value: app.hidden_units
+        on_text_validate: app.hidden_units = self.value
     Label:
         pos_hint: {'x': .1, 'center_y': .65}
         text: '# hidden units'
@@ -74,8 +62,8 @@ FloatLayout:
         text: '0'
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .55}
-        value: app.numValidInput
-        on_text_validate: app.numValidInput = self.value
+        value: app.num_valid_input
+        on_text_validate: app.num_valid_input = self.value
     Label: 
         pos_hint: {'x': .1, 'center_y': .55}
         text: '# validations'
@@ -86,8 +74,8 @@ FloatLayout:
         text: '0'
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .45}
-        value: app.numTestData
-        on_text_validate: app.numTestData = self.value
+        value: app.num_test_data
+        on_text_validate: app.num_test_data = self.value
     Label: 
         pos_hint: {'x': .1, 'center_y': .45}
         text: '# test data'
@@ -98,8 +86,8 @@ FloatLayout:
         text: '0.1'
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .35}
-        value: app.hiddenUnitsLearningRate
-        on_text_validate: app.hiddenUnitsLearningRate = self.value
+        value: app.hidden_units_learning_rate
+        on_text_validate: app.hidden_units_learning_rate = self.value
     Label: 
         pos_hint: {'x': .1, 'center_y': .36}
         text: 'hidden units'
@@ -114,8 +102,8 @@ FloatLayout:
         text: '0.2'
         size_hint: (.07, .05)
         pos_hint: {'x': .8, 'center_y': .65}
-        value: app.outputUnitsLearningRate
-        on_text_validate: app.outputUnitsLearningRate = self.value
+        value: app.output_units_learning_rate
+        on_text_validate: app.output_units_learning_rate = self.value
     Label: 
         pos_hint: {'x': .6, 'center_y': .66}
         text: 'output units'
@@ -158,13 +146,14 @@ FloatLayout:
         text: '0'
         size_hint: (.07, .05)
         pos_hint: {'x': .8, 'center_y': .35}
-        value: app.rmse
-        on_text_validate: app.rmse = self.value
+        value: app.minimum_rmse
+        on_text_validate: app.minimum_rmse = self.value
     Label: 
         pos_hint: {'x': .6, 'center_y': .35}
         text: 'or minimum RMSE'
         size_hint: (.2, .1)
 '''
+
 
 class runTrain(Screen):
     def __init__(self, **kwargs):

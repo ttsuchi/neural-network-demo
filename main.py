@@ -14,6 +14,7 @@ from result import Example
 
 ALL_SCREENS = [SelectDataSet, RunPCA, runTrain, Example]
 
+
 class NeuralNetworkDemoApp(App):
     # Application properties
     # See https://kivy.org/docs/api-kivy.properties.html
@@ -36,17 +37,17 @@ class NeuralNetworkDemoApp(App):
     pca_components = BoundedNumericProperty(10, min=1)
 
     # train inputs
-    hiddenunits = 10
-    numValidInput = 0
-    numTestData = 0
-    hiddenUnitsLearningRate = 0.1
-    outputUnitsLearningRate = 0.2
-    momentum = 0.2
-    epochs = 0
-    rmse = 0
+    hidden_units = BoundedNumericProperty(10, min=1)
+    num_valid_input = 0
+    num_test_data = 0
+    hidden_units_learning_rate = BoundedNumericProperty(0.1, min=0.001, max=1.0)
+    output_units_learning_rate = BoundedNumericProperty(0.2, min=0.001, max=1.0)
+    momentum = BoundedNumericProperty(0.2, min=0, max=1.0)
+    epochs = BoundedNumericProperty(1000, min=1, max=5000)
+    minimum_rmse = BoundedNumericProperty(0, min=0.0, max=1.0)
 
     # the categories of training
-    training = OptionProperty('Expression', options=['gender', 'expression', 'identity'])
+    training = OptionProperty('Expression', options=['Gender', 'Expression', 'Identity'])
 
     #
     # Main Kivy code for building the application UI.
