@@ -9,10 +9,10 @@ from kivy.logger import Logger
 
 from dataset import SelectDataSet
 from pca import RunPCA
-from train import Train
+from train import runTrain
 from result import Example
 
-ALL_SCREENS = [SelectDataSet, RunPCA, Train, Example]
+ALL_SCREENS = [SelectDataSet, RunPCA, runTrain, Example]
 
 class NeuralNetworkDemoApp(App):
     # Application properties
@@ -35,7 +35,18 @@ class NeuralNetworkDemoApp(App):
     # PCA components (the max will be controlled by the maximum_pca_components)
     pca_components = BoundedNumericProperty(10, min=1)
 
+    # train inputs
+    hiddenunits = 10
+    numValidInput = 0
+    numTestData = 0
+    hiddenUnitsLearningRate = 0.1
+    outputUnitsLearningRate = 0.2
+    momentum = 0.2
+    epochs = 0
+    rmse = 0
 
+    # the categories of training
+    training = OptionProperty('Expression', options=['gender', 'expression', 'identity'])
 
     #
     # Main Kivy code for building the application UI.

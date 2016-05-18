@@ -67,3 +67,7 @@ target/
 .py~
 .*~
 *~
+*.swp
+*.swp
+.pca.py.swp
+*.swp
