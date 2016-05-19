@@ -12,8 +12,8 @@ FloatLayout:
         size_hint: (.2, .1)
         allow_no_selection: False
         text: 'CAFE'
-        on_press: app.dataset = 'CAFE'
-        state: 'down' if app.dataset == 'CAFE' else 'normal'
+        on_press: app.dataset_name = 'CAFE'
+        state: 'down' if app.dataset_name == 'CAFE' else 'normal'
         pos_hint: { 'x': .2, 'center_y': .5 }
 
     ToggleButton:
@@ -21,8 +21,8 @@ FloatLayout:
         size_hint: (.2, .1)
         allow_no_selection: False
         text: 'POFA'
-        on_press: app.dataset = 'POFA'
-        state: 'down' if app.dataset == 'POFA' else 'normal'
+        on_press: app.dataset_name = 'POFA'
+        state: 'down' if app.dataset_name == 'POFA' else 'normal'
         pos_hint: {'center_x': .7, 'center_y': .5}
 
     Button:

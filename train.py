@@ -37,7 +37,7 @@ FloatLayout:
         text: 'Train'
         size_hint: (.25, .1)
         pos: (410, 30)
-        on_press: app.go_next()
+        on_press: app.start_training()
 
     Button:
         text: 'Back'
@@ -47,11 +47,11 @@ FloatLayout:
 
 
     TextInput:
-        text: '10'
+        text: str(app.num_hidden_units)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .65}
-        value: app.hidden_units
-        on_text_validate: app.hidden_units = self.value
+        multiline: False
+        on_text_validate: app.num_hidden_units = int(self.value)
     Label:
         pos_hint: {'x': .1, 'center_y': .65}
         text: '# hidden units'
@@ -99,10 +99,9 @@ FloatLayout:
     
 
     TextInput:
-        text: '0.2'
+        text: str(app.output_units_learning_rate)
         size_hint: (.07, .05)
         pos_hint: {'x': .8, 'center_y': .65}
-        value: app.output_units_learning_rate
         on_text_validate: app.output_units_learning_rate = self.value
     Label: 
         pos_hint: {'x': .6, 'center_y': .66}
@@ -115,10 +114,9 @@ FloatLayout:
         
     
     TextInput:
-        text: '0.2'
+        text: str(app.momentum)
         size_hint: (.07, .05)
         pos_hint: {'x': .8, 'center_y': .55}
-        value: app.momentum
         on_text_validate: app.momentum = self.value
     Label: 
         pos_hint: {'x': .6, 'center_y': .55}
@@ -127,11 +125,11 @@ FloatLayout:
         
     
     TextInput:
-        text: '0'
+        text: str(app.epochs)
         size_hint: (.07, .05)
         pos_hint: {'x': .8, 'center_y': .45}
-        value: app.epochs
-        on_text_validate: app.epochs = self.value
+        on_text_validate: app.epochs = int(self.text)
+        multiline: False
     Label: 
         pos_hint: {'x': .6, 'center_y': .46}
         text: '# of epochs'
@@ -143,10 +141,9 @@ FloatLayout:
 
     
     TextInput:
-        text: '0'
+        text: str(app.minimum_rmse)
         size_hint: (.07, .05)
         pos_hint: {'x': .8, 'center_y': .35}
-        value: app.minimum_rmse
         on_text_validate: app.minimum_rmse = self.value
     Label: 
         pos_hint: {'x': .6, 'center_y': .35}
