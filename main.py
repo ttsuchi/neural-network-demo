@@ -80,8 +80,8 @@ class NeuralNetworkDemoApp(App):
 
     # train inputs
     num_hidden_units = BoundedNumericProperty(10, min=1)
-    num_valid_input = 0
-    num_test_data = 0
+    num_valid_input = BoundedNumericProperty(0, min=0)
+    num_test_data = BoundedNumericProperty(0, min=0)
     hidden_units_learning_rate = BoundedNumericProperty(0.1, min=0.001, max=1.0)
     output_units_learning_rate = BoundedNumericProperty(0.2, min=0.001, max=1.0)
     momentum = BoundedNumericProperty(0.2, min=0, max=1.0)

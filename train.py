@@ -17,8 +17,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Gender'
         pos_hint: {'x':.1, 'center_y': .83}
-        on_press: app.training = 'gender'
-        state: 'down' if app.training == 'gender' else 'normal'
+        on_press: app.training = 'Gender'
+        state: 'down' if app.training == 'Gender' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
@@ -27,8 +27,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Expression'
         pos_hint: {'x': .4, 'center_y': .83}
-        on_press: app.training = 'expression'
-        state: 'down' if app.training == 'expression' else 'normal'
+        on_press: app.training = 'Expression'
+        state: 'down' if app.training == 'Expression' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
@@ -37,8 +37,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Identity'
         pos_hint: {'center_x': .8, 'center_y': .83}
-        on_press: app.training = 'identity'
-        state: 'down' if app.training == 'identity' else 'normal'
+        on_press: app.training = 'Identity'
+        state: 'down' if app.training == 'Identity' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
@@ -59,11 +59,10 @@ FloatLayout:
 
 
     TextInput:
-        text: '10'
+        text: str(app.num_hidden_units)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .65}
-        value: app.hiddenunits
-        on_text_validate: app.hiddenunits = self.value
+        on_text_validate: app.num_hidden_units = int(self.value)
     Label:
         pos_hint: {'x': .05, 'center_y': .65}
         text: '# hidden units'
@@ -75,17 +74,16 @@ FloatLayout:
         size_hint: (.3, .1)
         min: 1
         max: 100
-        value: app.hiddenunits
-        on_value: app.hiddenunits = self.value
+        value: app.num_hidden_units
+        on_value: app.num_hidden_units = self.value
 
 
 
     TextInput:
-        text: '0'
+        text: str(app.num_valid_input)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .55}
-        value: app.numValidInput
-        on_text_validate: app.numValidInput = self.value
+        on_text_validate: app.num_valid_input = int(self.value)
     Label:
         pos_hint: {'x': .05, 'center_y': .55}
         text: '# validations'
@@ -96,16 +94,15 @@ FloatLayout:
         size_hint: (.3, .1)
         min: 1
         max: 100
-        value: app.numValidInput
-        on_value: app.numValidInput = self.value
+        value: app.num_valid_input
+        on_value: app.num_valid_input = self.value
 
 
     TextInput:
-        text: '0'
+        text: str(app.num_test_data)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .45}
-        value: app.numTestData
-        on_text_validate: app.numTestData = self.value
+        on_text_validate: app.num_test_data = int(self.value)
     Label:
         pos_hint: {'x': .05, 'center_y': .45}
         text: '# test data'
@@ -116,16 +113,15 @@ FloatLayout:
         size_hint: (.3, .1)
         min: 1
         max: 100
-        value: app.numTestData
-        on_value: app.numTestData = self.value
+        value: app.num_test_data
+        on_value: app.num_test_data = self.value
 
 
     TextInput:
-        text: '0.1'
+        text: str(app.hidden_units_learning_rate)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .34}
-        value: app.hiddenUnitsLearningRate
-        on_text_validate: app.hiddenUnitsLearningRate = self.value
+        on_text_validate: app.hidden_units_learning_rate = float(self.value)
     Label:
         pos_hint: {'x': .05, 'center_y': .36}
         text: 'hidden units'
@@ -138,19 +134,18 @@ FloatLayout:
     Slider:
         pos: (30, 147)
         size_hint: (.3, .1)
-        min: 1
-        max: 100
-        value: app.hiddenUnitsLearningRate
-        on_value: app.hiddenUnitsLearningRate = self.value
+        min: 0.001
+        max: 1.0
+        value: app.hidden_units_learning_rate
+        on_value: app.hidden_units_learning_rate = self.value
 
 
 
     TextInput:
-        text: '0.2'
+        text: str(app.output_units_learning_rate)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .65}
-        value: app.outputUnitsLearningRate
-        on_text_validate: app.outputUnitsLearningRate = self.value
+        on_text_validate: app.output_units_learning_rate = float(self.value)
     Label:
         pos_hint: {'x': .65, 'center_y': .66}
         text: 'output units'
@@ -163,18 +158,17 @@ FloatLayout:
     Slider:
         pos: (525, 330)
         size_hint: (.3, .1)
-        min: 1
-        max: 100
-        value: app.outputUnitsLearningRate
-        on_value: app.outputUnitsLearningRate = self.value
+        min: 0.001
+        max: 1.0
+        value: app.output_units_learning_rate
+        on_value: app.output_units_learning_rate = self.value
 
 
     TextInput:
-        text: '0.2'
+        text: str(app.momentum)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .55}
-        value: app.momentum
-        on_text_validate: app.momentum = self.value
+        on_text_validate: app.momentum = float(self.value)
     Label:
         pos_hint: {'x': .65, 'center_y': .55}
         text: 'momentum rate'
@@ -182,18 +176,17 @@ FloatLayout:
     Slider:
         pos: (525, 272)
         size_hint: (.3, .1)
-        min: 1
-        max: 100
+        min: 0.001
+        max: 1.0
         value: app.momentum
         on_value: app.momentum = self.value
 
 
     TextInput:
-        text: '0'
+        text: str(app.epochs)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .45}
-        value: app.epochs
-        on_text_validate: app.epochs = self.value
+        on_text_validate: app.epochs = int(self.value)
     Label:
         pos_hint: {'x': .65, 'center_y': .46}
         text: '# of epochs'
@@ -214,11 +207,10 @@ FloatLayout:
 
 
     TextInput:
-        text: '0'
+        text: str(app.minimum_rmse)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .35}
-        value: app.rmse
-        on_text_validate: app.rmse = self.value
+        on_text_validate: app.minimum_rmse = int(self.value)
     Label:
         pos_hint: {'x': .65, 'center_y': .35}
         text: 'or minimum RMSE'
@@ -229,8 +221,8 @@ FloatLayout:
         size_hint: (.3, .1)
         min: 1
         max: 100
-        value: app.rmse
-        on_value: app.rmse = self.value
+        value: app.minimum_rmse
+        on_value: app.minimum_rmse = self.value
 '''
 
 class runTrain(Screen):
