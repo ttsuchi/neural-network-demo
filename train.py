@@ -65,10 +65,20 @@ FloatLayout:
         value: app.hiddenunits
         on_text_validate: app.hiddenunits = self.value
     Label:
-        pos_hint: {'x': .1, 'center_y': .65}
+        pos_hint: {'x': .05, 'center_y': .65}
         text: '# hidden units'
         size_hint: (.2, .1)
-                
+    
+    
+    Slider:
+        pos: (30, 330)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.hiddenunits
+        on_value: app.hiddenunits = self.value
+        
+
 
     TextInput:
         text: '0'
@@ -77,9 +87,17 @@ FloatLayout:
         value: app.numValidInput
         on_text_validate: app.numValidInput = self.value
     Label: 
-        pos_hint: {'x': .1, 'center_y': .55}
+        pos_hint: {'x': .05, 'center_y': .55}
         text: '# validations'
         size_hint: (.2, .1)
+
+    Slider:
+        pos: (30, 272)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.numValidInput
+        on_value: app.numValidInput = self.value
 
 
     TextInput:
@@ -89,81 +107,130 @@ FloatLayout:
         value: app.numTestData
         on_text_validate: app.numTestData = self.value
     Label: 
-        pos_hint: {'x': .1, 'center_y': .45}
+        pos_hint: {'x': .05, 'center_y': .45}
         text: '# test data'
         size_hint: (.2, .1)
+
+    Slider:
+        pos: (30, 212)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.numTestData
+        on_value: app.numTestData = self.value
 
 
     TextInput:
         text: '0.1'
         size_hint: (.07, .05)
-        pos_hint: {'x': .3, 'center_y': .35}
+        pos_hint: {'x': .3, 'center_y': .34}
         value: app.hiddenUnitsLearningRate
         on_text_validate: app.hiddenUnitsLearningRate = self.value
     Label: 
-        pos_hint: {'x': .1, 'center_y': .36}
+        pos_hint: {'x': .05, 'center_y': .36}
         text: 'hidden units'
         size_hint: (.2, .1)
     Label:
-        pos_hint: {'x': .1, 'center_y': .34}
+        pos_hint: {'x': .05, 'center_y': .34}
         text: 'learning rate'
         size_hint: (.2, .1)
+
+    Slider:
+        pos: (30, 147)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.hiddenUnitsLearningRate
+        on_value: app.hiddenUnitsLearningRate = self.value
+
     
 
     TextInput:
         text: '0.2'
         size_hint: (.07, .05)
-        pos_hint: {'x': .8, 'center_y': .65}
+        pos_hint: {'x': .9, 'center_y': .65}
         value: app.outputUnitsLearningRate
         on_text_validate: app.outputUnitsLearningRate = self.value
     Label: 
-        pos_hint: {'x': .6, 'center_y': .66}
+        pos_hint: {'x': .65, 'center_y': .66}
         text: 'output units'
         size_hint: (.2, .1)
     Label:
-        pos_hint: {'x': .6, 'center_y': .64}
+        pos_hint: {'x': .65, 'center_y': .64}
         text: 'learning rate'
         size_hint: (.2, .1)
+
+    Slider:
+        pos: (525, 330)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.outputUnitsLearningRate
+        on_value: app.outputUnitsLearningRate = self.value
         
     
     TextInput:
         text: '0.2'
         size_hint: (.07, .05)
-        pos_hint: {'x': .8, 'center_y': .55}
+        pos_hint: {'x': .9, 'center_y': .55}
         value: app.momentum
         on_text_validate: app.momentum = self.value
     Label: 
-        pos_hint: {'x': .6, 'center_y': .55}
+        pos_hint: {'x': .65, 'center_y': .55}
         text: 'momentum rate'
         size_hint: (.2, .1)
+    Slider:
+        pos: (525, 272)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.momentum
+        on_value: app.momentum = self.value
         
     
     TextInput:
         text: '0'
         size_hint: (.07, .05)
-        pos_hint: {'x': .8, 'center_y': .45}
+        pos_hint: {'x': .9, 'center_y': .45}
         value: app.epochs
         on_text_validate: app.epochs = self.value
     Label: 
-        pos_hint: {'x': .6, 'center_y': .46}
+        pos_hint: {'x': .65, 'center_y': .46}
         text: '# of epochs'
         size_hint: (.2, .1)
     Label:
-        pos_hint: {'x': .6, 'center_y': .44}
+        pos_hint: {'x': .65, 'center_y': .44}
         text: 'needed to train'
         size_hint: (.2, .1)
+
+    Slider:
+        pos: (525, 212)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.epochs
+        on_value: app.epochs = self.value
+
 
     
     TextInput:
         text: '0'
         size_hint: (.07, .05)
-        pos_hint: {'x': .8, 'center_y': .35}
+        pos_hint: {'x': .9, 'center_y': .35}
         value: app.rmse
         on_text_validate: app.rmse = self.value
     Label: 
-        pos_hint: {'x': .6, 'center_y': .35}
+        pos_hint: {'x': .65, 'center_y': .35}
         text: 'or minimum RMSE'
         size_hint: (.2, .1)
+
+    Slider:
+        pos: (525, 147)
+        size_hint: (.3, .1)
+        min: 1
+        max: 100
+        value: app.rmse
+        on_value: app.rmse = self.value
 '''
 
 class runTrain(Screen):
