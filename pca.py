@@ -2,16 +2,15 @@ import matplotlib
 
 matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
 
-from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.uix.screenmanager import Screen
-from kivy.uix.boxlayout import BoxLayout
 
 from kivy.properties import NumericProperty, ObjectProperty
 
-import matplotlib.pyplot as plt
 from numpy import *
+
+from graph import Graph, ImageFromData
 
 kv = '''
 BoxLayout:
@@ -55,10 +54,10 @@ BoxLayout:
                     halign: 'center'
                 BoxLayout:
                     orientation: 'horizontal'
-                    MPLImage:
+                    FaceImage:
                         dataset: app.dataset
                         image_index: 0
-                    MPLImage:
+                    FaceImage:
                         dataset: app.dataset
                         image_index: 1
             BoxLayout:
@@ -70,18 +69,18 @@ BoxLayout:
                     halign: 'center'
                 BoxLayout:
                     orientation: 'horizontal'
-                    MPLImage:
+                    FaceImage:
                         dataset: app.dataset
                         image_index: 0
                         pca_data: app.pca_data
                         pca_components: app.pca_components
-                    MPLImage:
+                    FaceImage:
                         dataset: app.dataset
                         image_index: 1
                         pca_data: app.pca_data
                         pca_components: app.pca_components
 
-        MPLGraph:
+        PCAGraph:
             size_hint: (0.65, 1)
             id: pca_graph
             padding: 5
@@ -111,17 +110,14 @@ BoxLayout:
 '''
 
 
-class MPLImage(BoxLayout):
+class FaceImage(ImageFromData):
     dataset = ObjectProperty()
     image_index = NumericProperty(-1)
     pca_data = ObjectProperty(rebind=True)
     pca_components = NumericProperty()
 
     def __init__(self, **kwargs):
-        super(MPLImage, self).__init__(**kwargs)
-        self.fig, self.ax = plt.subplots(facecolor='black')
-        self.ax.set_axis_bgcolor('black')
-        self.add_widget(FigureCanvas(self.fig))
+        super(FaceImage, self).__init__(**kwargs)
 
         self.bind(
             dataset=self._redraw_graph,
@@ -130,10 +126,10 @@ class MPLImage(BoxLayout):
             pca_data=self._redraw_graph
         )
 
-    def _redraw_graph(self, instance, value):
-        if value is None or self.dataset is None or self.image_index < 0:
-            return
+    def check_value(self, value):
+        return value is not None and self.dataset is not None and self.image_index >= 0
 
+    def get_image_data(self):
         image_size = self.dataset.images.shape[1:]
         image = self.dataset.images[self.image_index]
 
@@ -141,26 +137,20 @@ class MPLImage(BoxLayout):
             image_data = image.flatten()
             if len(image_data) != self.pca_data.V.shape[1]:
                 Logger.info('Incompatible image data size: %d vs %s' % (len(image_data), str(self.pca_data.V.shape)))
-                return
+                return None
+
             image = self.pca_data.reconstruct(image.flatten(), self.pca_components).reshape(image_size)
 
-        ax = self.ax
-        ax.imshow(image, aspect='normal', cmap='gray')
-        ax.set_axis_off()
-
-        self.fig.canvas.draw()
+        return image
 
 
-class MPLGraph(BoxLayout):
+class PCAGraph(Graph):
     maximum_pca_components = NumericProperty()
     pca_components = NumericProperty()
     pca_data = ObjectProperty(rebind=True)
 
     def __init__(self, **kwargs):
-        super(MPLGraph, self).__init__(**kwargs)
-        self.fig, self.ax = plt.subplots(facecolor='black')
-        self.ax.set_axis_bgcolor('black')
-        self.add_widget(FigureCanvas(self.fig))
+        super(PCAGraph, self).__init__(**kwargs)
 
         self.bind(
             maximum_pca_components=self._redraw_graph,
@@ -168,34 +158,18 @@ class MPLGraph(BoxLayout):
             pca_data=self._redraw_graph
         )
 
-    def _redraw_graph(self, instance, value):
+    def check_value(self, value):
         if value is None or self.pca_data is None or self.maximum_pca_components == 0 or self.pca_components == 0:
-            return
+            return False
 
         if self.pca_data.explained_variance.shape[
             0] != self.maximum_pca_components or self.pca_components >= self.maximum_pca_components:
-            return
+            return False
 
         Logger.info("Updating PCA graph for max %d with %s at %d" % (
-        self.maximum_pca_components, str(self.pca_data.explained_variance.shape), self.pca_components))
+            self.maximum_pca_components, str(self.pca_data.explained_variance.shape), self.pca_components))
 
-        ax = self.ax
-        ax.cla()
-        self.draw_graph(self.ax)
-
-        # Clean up the axes
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.get_xaxis().tick_bottom()
-        ax.get_yaxis().tick_left()
-        ax.xaxis.label.set_color('white')
-        ax.yaxis.label.set_color('white')
-        ax.tick_params(axis='x', colors='white')
-        ax.tick_params(axis='y', colors='white')
-        ax.spines['bottom'].set_color('white')
-        ax.spines['left'].set_color('white')
-
-        self.fig.canvas.draw()
+        return True
 
     def draw_graph(self, ax):
         v = self.pca_data.explained_variance.cumsum()

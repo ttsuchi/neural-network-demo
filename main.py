@@ -121,45 +121,5 @@ class NeuralNetworkDemoApp(App):
         Logger.info('Moving to ' + self.manager.previous())
         self.manager.current = self.manager.previous()
 
-    # Manage network training
-    def start_training(self):
-        '''Create a pop-up with a simple progress bar for training progress.'''
-        self.popup = Builder.load_string(popup_kv)
-        self.popup.open()
-
-    def _start_training_thread(self):
-        self.cancel_training = False
-        self.popup.ids.training_progress.value = 0
-        self.rmse_plot = MeshLinePlot(color=[1, 0, 0, 5])
-        self.cerr_plot = MeshLinePlot(color=[0, 0, 1, 5])
-        self.popup.ids.training_graph.add_plot(self.rmse_plot)
-        self.popup.ids.training_graph.add_plot(self.cerr_plot)
-        threading.Thread(target=self._do_train).start()
-
-    def _cancel_training(self):
-        self.cancel_training = True
-
-    @mainthread
-    def _update_progress(self, epoch, rmse, cerr):
-        self.popup.ids.training_progress.value = epoch
-        self.rmse_plot.points.append((epoch, rmse))
-        self.cerr_plot.points.append((epoch, cerr))
-
-    def _do_train(self):
-        import time
-        from numpy import exp
-        for epoch in range(self.epochs):
-            if self.cancel_training:
-                break
-            time.sleep(1)
-            rmse = exp(-epoch)
-            cerr = 0.5 * (exp(-epoch))
-            self._update_progress(epoch, rmse, cerr)
-        self.popup.dismiss()
-
-        if not self.cancel_training:
-            self.go_next()
-
-
 if __name__ == '__main__':
     NeuralNetworkDemoApp().run()
