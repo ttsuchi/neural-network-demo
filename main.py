@@ -15,11 +15,11 @@ import threading
 
 from dataset import SelectDataSet
 from pca import RunPCA
-from train import runTrain
-from result import Example
+from training_parameters import TrainingParameters
+from result import TrainingResult
 from neural_network import PCAData
 
-ALL_SCREENS = [SelectDataSet, RunPCA, runTrain, Example]
+ALL_SCREENS = [SelectDataSet, RunPCA, TrainingParameters, TrainingResult]
 
 popup_kv = '''
 Popup:

@@ -1,15 +1,5 @@
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.togglebutton import ToggleButton
-from kivy.app import App
-from kivy.uix.slider import Slider
-from kivy.uix.image import Image
-from kivy.uix.dropdown import DropDown
-from kivy.uix.textinput import TextInput
-from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
+from kivy.uix.screenmanager import Screen
 
 kv = '''
 FloatLayout:
@@ -225,7 +215,8 @@ FloatLayout:
         on_value: app.minimum_rmse = self.value
 '''
 
-class runTrain(Screen):
+
+class TrainingParameters(Screen):
     def __init__(self, **kwargs):
-        super(runTrain, self).__init__(**kwargs)
+        super(TrainingParameters, self).__init__(**kwargs)
         self.add_widget(Builder.load_string(kv))
