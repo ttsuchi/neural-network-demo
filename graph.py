@@ -34,7 +34,7 @@ class ImageFromData(BoxLayout):
             return
 
         ax = self.ax
-        ax.imshow(image_data, aspect='normal', cmap='gray')
+        ax.imshow(image_data, aspect='auto', cmap='gray')
         ax.set_axis_off()
 
         self.fig.canvas.draw()

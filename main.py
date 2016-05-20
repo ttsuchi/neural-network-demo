@@ -7,12 +7,6 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.properties import OptionProperty, BoundedNumericProperty, AliasProperty
 from kivy.logger import Logger
 
-from kivy.lang import Builder
-from kivy.garden.graph import MeshLinePlot
-
-from kivy.clock import mainthread
-import threading
-
 from dataset import SelectDataSet
 from pca import RunPCA
 from training_parameters import TrainingParameters
@@ -20,34 +14,6 @@ from result import TrainingResult
 from neural_network import PCAData
 
 ALL_SCREENS = [SelectDataSet, RunPCA, TrainingParameters, TrainingResult]
-
-popup_kv = '''
-Popup:
-    title: 'Network Training'
-    auto_dismiss: False
-    on_open: app._start_training_thread()
-    BoxLayout:
-        orientation: 'vertical'
-        Label:
-            text: 'Please wait while the network is trained...'
-        ProgressBar:
-            id: training_progress
-            max: app.epochs
-        Graph:
-            id: training_graph
-            xlabel: 'Epochs'
-            ylabel: 'Errors'
-            xmin: 0
-            xmax: app.epochs
-            ymin: 0
-            ymax: 2.0
-            x_grid: True
-            y_grid: True
-            padding: 5
-        Button:
-            text: 'Cancel'
-            on_release: app._cancel_training()
-'''
 
 
 class NeuralNetworkDemoApp(App):
@@ -120,6 +86,7 @@ class NeuralNetworkDemoApp(App):
         self.manager.transition.direction = 'right'
         Logger.info('Moving to ' + self.manager.previous())
         self.manager.current = self.manager.previous()
+
 
 if __name__ == '__main__':
     NeuralNetworkDemoApp().run()
