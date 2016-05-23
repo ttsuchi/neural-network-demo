@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 from kivy.app import App
 from kivy.clock import mainthread
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas
+from kivy.graphics.texture import Texture
+from kivy.graphics.vertex_instructions import Rectangle
 from kivy.lang import Builder
 from kivy.logger import Logger
-from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
+from kivy.uix.image import Image
 from numpy import *
 
 from neural_network import NeuralNetwork
@@ -46,6 +48,8 @@ BoxLayout:
             size_hint: (.6, 1)
 
     ScrollView:
+        id: result_scrollview
+        disabled: True
         size_hint: (1, .6)
         do_scroll_x: False
         do_scroll_y: True
@@ -117,6 +121,15 @@ class TrainingGraph(FigureCanvas):
         self.draw()
 
 
+class ResultImage(Image):
+    def __init__(self, image_data, **kwargs):
+        height, width = image_data.shape
+        super(ResultImage, self).__init__(size=(width, height), **kwargs)
+        self.texture = Texture.create(size=(width, height), colorfmt='luminance')
+        self.texture.blit_buffer((image_data * 255).astype(ubyte).tostring(), colorfmt='luminance', bufferfmt='ubyte')
+        self.texture.flip_vertical()
+
+
 class TrainingResult(Screen):
     def __init__(self, **kwargs):
         super(TrainingResult, self).__init__(**kwargs)
@@ -128,22 +141,22 @@ class TrainingResult(Screen):
         self.network = NeuralNetwork(App.get_running_app())
 
         # Sample content
-        grid = self.ids.result_grid
-        for j in range(157):
-            # First column: Actual image
-            grid.add_widget(Image(source='face1.png'))
-
-            # Second column: Network's image reconstruction
-            grid.add_widget(Image(source='face1.png'))
-
-            # Third column: Network Representation
-            grid.add_widget(Label(text='mad', size_hint=(.5, .5)))
-
-            # Fourth column: Actual representation
-            grid.add_widget(Label(text='happy', size_hint=(.5, .5)))
-
-            # Fifth column: correct/incorrect
-            grid.add_widget(Label(text='1', size_hint=(.5, .5)))
+        # grid = self.ids.result_grid
+        # for j in range(157):
+        #     # First column: Actual image
+        #     grid.add_widget(Image(source='face1.png'))
+        #
+        #     # Second column: Network's image reconstruction
+        #     grid.add_widget(Image(source='face1.png'))
+        #
+        #     # Third column: Network Representation
+        #     grid.add_widget(Label(text='mad', size_hint=(.5, .5)))
+        #
+        #     # Fourth column: Actual representation
+        #     grid.add_widget(Label(text='happy', size_hint=(.5, .5)))
+        #
+        #     # Fifth column: correct/incorrect
+        #     grid.add_widget(Label(text='1', size_hint=(.5, .5)))
 
         # Bind the buttons
         def back_pressed(instance):
@@ -163,6 +176,8 @@ class TrainingResult(Screen):
 
     def resume_training(self, instance):
         Logger.info('Resuming training')
+        self.clear_results()
+
         self.training_paused = False
         pause_button = self.ids.pause_button
         pause_button.text = 'Pause'
@@ -182,6 +197,40 @@ class TrainingResult(Screen):
         pause_button.unbind(on_press=self.pause_training)
         pause_button.bind(on_press=self.resume_training)
 
+        self.display_results()
+
+    def clear_results(self):
+        '''Clears all children of the grid, except for the header labels.'''
+        grid = self.ids.result_grid
+        grid.clear_widgets()
+
+    @mainthread
+    def display_results(self):
+        '''Shows the result of the training in the grid.'''
+        grid = self.ids.result_grid
+
+        predictions, reconstructions = self.network.predict_all()
+        predictions_correct = predictions == self.network.targets
+        for is_test, image, reconstruction, prediction, target, prediction_correct in \
+                zip(self.network.idx_test, self.network.app.dataset.images, reconstructions, predictions,
+                    self.network.targets, predictions_correct):
+            # First column: Actual image
+            grid.add_widget(ResultImage(image))
+
+            # Second column: Network's image reconstruction
+            grid.add_widget(ResultImage(reconstruction))
+
+            # Third column: Network Representation
+            grid.add_widget(Label(text='%d' % (prediction + 1), size_hint=(.5, .5)))
+
+            # Fourth column: Actual representation
+            grid.add_widget(Label(text='%d' % (target + 1), size_hint=(.5, .5)))
+
+            # Fifth column: correct/incorrect
+            grid.add_widget(Label(text='%d' % prediction_correct, size_hint=(.5, .5)))
+
+        self.ids.result_scrollview.disabled = False
+
     def _run_training(self):
         graph = self.ids.training_graph
         for epoch, epochs, rmse, cerr, is_last in self.network.resume_training():
@@ -193,3 +242,4 @@ class TrainingResult(Screen):
                 break
 
         Logger.info('Exit training thread')
+        self.display_results()

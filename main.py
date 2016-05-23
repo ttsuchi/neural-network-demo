@@ -23,7 +23,7 @@ from dataset import SelectDataSet
 from pca import RunPCA
 from training_parameters import TrainingParameters
 from result import TrainingResult
-from neural_network import PCAData
+from neural_network import PCAData, PCATransformer
 
 ALL_SCREENS = [SelectDataSet, RunPCA, TrainingParameters, TrainingResult]
 
@@ -50,11 +50,15 @@ class NeuralNetworkDemoApp(App):
     dataset = AliasProperty(_load_dataset, None, bind=['dataset_name'])
     maximum_pca_components = AliasProperty(lambda self: min(self.dataset.data.shape), None, bind=['dataset'])
 
+    # PCA transformed data
+    pca_data = AliasProperty(lambda self: PCAData(self.dataset.data), None, bind=['dataset'])
+
     # PCA components (the max will be controlled by the maximum_pca_components)
     pca_components = BoundedNumericProperty(10, min=1)
 
-    # PCA transformed data
-    pca_data = AliasProperty(lambda self: PCAData(self.dataset.data), None, bind=['dataset'])
+    # PCA transformer
+    pca_transformer = AliasProperty(lambda self: PCATransformer(self.pca_data, self.pca_components), None,
+                                    bind=['pca_data', 'pca_components'])
 
     # train inputs
     num_hidden_units = BoundedNumericProperty(10, min=1)
@@ -63,11 +67,11 @@ class NeuralNetworkDemoApp(App):
     hidden_units_learning_rate = BoundedNumericProperty(0.1, min=0.001, max=1.0)
     output_units_learning_rate = BoundedNumericProperty(0.2, min=0.001, max=1.0)
     momentum = BoundedNumericProperty(0.2, min=0, max=1.0)
-    epochs = BoundedNumericProperty(100, min=1, max=10000)
+    epochs = BoundedNumericProperty(1000, min=1, max=10000)
     minimum_rmse = BoundedNumericProperty(0, min=0.0, max=1.0)
 
     # the categories of training
-    training = OptionProperty('Expression', options=['Gender', 'Expression', 'Identity'])
+    target_name = OptionProperty('Expression', options=['Gender', 'Expression', 'Identity'])
 
     #
     # Main Kivy code for building the application UI.

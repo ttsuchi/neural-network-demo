@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas
+from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.properties import NumericProperty, ObjectProperty
+from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
 from numpy import *
 
@@ -48,12 +50,12 @@ BoxLayout:
                     halign: 'center'
                 BoxLayout:
                     orientation: 'horizontal'
-                    FaceImage:
+                    PCAFaceImage:
                         dataset: app.dataset
-                        image_index: 0
-                    FaceImage:
+                        index: 0
+                    PCAFaceImage:
                         dataset: app.dataset
-                        image_index: 1
+                        index: 1
             BoxLayout:
                 orientation: 'vertical'
                 id: after_images
@@ -63,16 +65,14 @@ BoxLayout:
                     halign: 'center'
                 BoxLayout:
                     orientation: 'horizontal'
-                    FaceImage:
+                    PCAFaceImage:
                         dataset: app.dataset
-                        image_index: 0
-                        pca_data: app.pca_data
-                        pca_components: app.pca_components
-                    FaceImage:
+                        index: 0
+                        pca_transformer: app.pca_transformer
+                    PCAFaceImage:
                         dataset: app.dataset
-                        image_index: 1
-                        pca_data: app.pca_data
-                        pca_components: app.pca_components
+                        index: 1
+                        pca_transformer: app.pca_transformer
 
         PCAGraph:
             size_hint: (0.65, 1)
@@ -104,41 +104,40 @@ BoxLayout:
 '''
 
 
-class FaceImage(FigureCanvas):
+class PCAFaceImage(Image):
     dataset = ObjectProperty()
-    image_index = NumericProperty(-1)
-    pca_data = ObjectProperty(rebind=True)
-    pca_components = NumericProperty()
+    index = NumericProperty(-1)
+    pca_transformer = ObjectProperty()
 
     def __init__(self, **kwargs):
-        fig, self.ax = plt.subplots()
-        super(FaceImage, self).__init__(fig, **kwargs)
-        self.ax.set_axis_off()
-
+        super(PCAFaceImage, self).__init__(**kwargs)
         self.bind(
-            dataset=self.plot_image,
-            image_index=self.plot_image,
-            pca_components=self.plot_image,
-            pca_data=self.plot_image
+            dataset=self.setup_texture,
+            index=self.plot_image,
+            pca_transformer=self.plot_image
         )
 
-    def plot_image(self, instance, value):
-        if value is None or self.dataset is None or self.image_index < 0:
+    def setup_texture(self, instance, value):
+        if value is None:
             return
 
-        image_size = self.dataset.images.shape[1:]
-        image = self.dataset.images[self.image_index]
+        _, height, width = self.dataset.images.shape
+        self.texture = Texture.create(size=(width, height), colorfmt='luminance')
+        self.plot_image(instance, None)
 
-        if self.pca_data is not None:
-            image_data = image.flatten()
-            if len(image_data) != self.pca_data.V.shape[1]:
-                Logger.info('Incompatible image data size: %d vs %s' % (len(image_data), str(self.pca_data.V.shape)))
-                return None
+    def plot_image(self, instance, value):
+        if value is None or self.dataset is None or self.index < 0:
+            return
 
-            image = self.pca_data.reconstruct(image.flatten(), self.pca_components).reshape(image_size)
+        image_data = self.dataset.images[self.index]
+        if self.pca_transformer is not None:
+            if len(self.pca_transformer.mean_) != len(image_data.flatten()):
+                return
+            image_data = self.pca_transformer.reconstruct(image_data)
 
-        self.ax.imshow(image)
-        self.draw()
+        self.texture.blit_buffer((image_data * 255).astype(ubyte).tostring(), colorfmt='luminance', bufferfmt='ubyte')
+        self.texture.flip_vertical()
+        self.canvas.ask_update()
 
 
 class PCAGraph(FigureCanvas):

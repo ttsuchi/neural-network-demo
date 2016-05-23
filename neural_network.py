@@ -17,7 +17,9 @@ def _train_test_split(X, T, test_size=0.25):
     N = len(T)
     S = floor(N * test_size)
     idx = permutation(N)
-    return X[idx[S:]], X[idx[:S]], T[idx[S:]], T[idx[:S]]
+    idx_test = zeros(N, dtype=bool)
+    idx_test[idx[:S]] = True
+    return X[idx[S:]], X[idx[:S]], T[idx[S:]], T[idx[:S]], idx_test
 
 
 class ShuffleSplit(object):
@@ -55,14 +57,21 @@ class PCAData(object):
     def explained_variance(self):
         return self.explained_variance_ / self.explained_variance_.sum()
 
-    def transform(self, X, pca_components):
-        V = self.V[:pca_components]
-        Xt = dot(X - self.mean_, V.T)
-        return Xt / sqrt(self.explained_variance_[:pca_components])
+class PCATransformer(object):
+    def __init__(self, pca_data, pca_components):
+        self.mean_ = pca_data.mean_
+        self.V = pca_data.V[:pca_components]
+        self.explained_variance_ = pca_data.explained_variance_[:pca_components]
 
-    def reconstruct(self, X, pca_components):
-        V = self.V[:pca_components]
-        return dot(dot(X - self.mean_, V.T), V) + self.mean_
+    def transform(self, X):
+        return dot(X - self.mean_, self.V.T) / sqrt(self.explained_variance_)
+
+    def inverse_transform(self, Xt):
+        return dot(Xt * sqrt(self.explained_variance_), self.V) + self.mean_
+
+    def reconstruct(self, X):
+        image_shape = X.shape
+        return self.inverse_transform(self.transform(X.flatten())).reshape(image_shape)
 
 
 class NeuralNetwork(object):
@@ -72,7 +81,8 @@ class NeuralNetwork(object):
     def reset_training(self):
         """Initialize the network for training."""
         app = self.app
-        self.targets = app.dataset[app.training] - 1
+        self.target_names = app.target_name
+        self.targets = app.dataset[app.target_name] - 1
         self.n_output = len(unique(self.targets))
         self.V_hidden = zeros((app.pca_components + 1, app.num_hidden_units))
         self.W_hidden = random_sample(self.V_hidden.shape)
@@ -82,13 +92,15 @@ class NeuralNetwork(object):
         self.hidden_units_learning_rate = app.hidden_units_learning_rate
         self.output_units_learning_rate = app.output_units_learning_rate
 
+        self.X = X = app.dataset.data
         # Split into training and test
-        X_train, X_test, self.y_train, self.y_test = _train_test_split(app.dataset.data, self.targets, test_size=app.num_test_data)
+        X_train, X_test, self.y_train, self.y_test, self.idx_test = \
+            _train_test_split(X, self.targets, test_size=app.num_test_data)
 
         # Preprocess the data using PCA
-        pca_data = PCAData(X_train)
-        self.X_train = pca_data.transform(X_train, app.pca_components)
-        self.X_test = pca_data.transform(X_test, app.pca_components)
+        self.pca_transformer = PCATransformer(PCAData(X_train), app.pca_components)
+        self.X_train = self.pca_transformer.transform(X_train)
+        self.X_test = self.pca_transformer.transform(X_test)
 
         # Epochs
         self.epoch = 0
@@ -161,14 +173,10 @@ class NeuralNetwork(object):
         self.V_hidden = self.hidden_units_learning_rate * dot(c_[inputs, bias].T, d_hidden) / n_samples
         self.W_hidden += self.V_hidden
 
-    def predict(self, n):
-        """Returns the prediction and the reconstruction for the sample n."""
-        X = self.X[n:n + 1]
-        outputs, hidden = self.feed_forward(X)
-        pca_reconstruction = self.pca.inverse_transform(X)
+    def predict_all(self):
+        """Returns the predictions and the reconstructions for all training / test data."""
+        outputs, hidden = self.feed_forward(self.pca_transformer.transform(self.X))
         hidden_expected = dot(self._inverse_activation(outputs), pinv(self.W_output))[:, :-1]
-        hidden_reconstruction = self.pca.inverse_transform(
+        hidden_reconstruction = self.pca_transformer.inverse_transform(
             dot(self._inverse_activation(hidden_expected), pinv(self.W_hidden))[:, :-1])
-        return (argmax(outputs),
-                pca_reconstruction.reshape(self.dataset.images.shape[1:]),
-                hidden_reconstruction.reshape(self.dataset.images.shape[1:]))
+        return outputs.argmax(axis=1), hidden_reconstruction.reshape(self.app.dataset.images.shape)

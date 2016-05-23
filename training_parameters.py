@@ -7,8 +7,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Gender'
         pos_hint: {'x':.1, 'center_y': .83}
-        on_press: app.training = 'Gender'
-        state: 'down' if app.training == 'Gender' else 'normal'
+        on_press: app.target_name = 'Gender'
+        state: 'down' if app.target_name == 'Gender' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
@@ -17,8 +17,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Expression'
         pos_hint: {'x': .4, 'center_y': .83}
-        on_press: app.training = 'Expression'
-        state: 'down' if app.training == 'Expression' else 'normal'
+        on_press: app.target_name = 'Expression'
+        state: 'down' if app.target_name == 'Expression' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
@@ -27,8 +27,8 @@ FloatLayout:
     ToggleButton:
         text: 'Train for Identity'
         pos_hint: {'center_x': .8, 'center_y': .83}
-        on_press: app.training = 'Identity'
-        state: 'down' if app.training == 'Identity' else 'normal'
+        on_press: app.target_name = 'Identity'
+        state: 'down' if app.target_name == 'Identity' else 'normal'
         size_hint: (.2, .1)
         group: 'training'
         allow_no_selection: False
