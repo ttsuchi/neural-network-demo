@@ -1,16 +1,10 @@
-import matplotlib
-
-matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
-
+import matplotlib.pyplot as plt
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas
 from kivy.lang import Builder
 from kivy.logger import Logger
-from kivy.uix.screenmanager import Screen
-
 from kivy.properties import NumericProperty, ObjectProperty
-
+from kivy.uix.screenmanager import Screen
 from numpy import *
-
-from graph import Graph, ImageFromData
 
 kv = '''
 BoxLayout:
@@ -110,26 +104,28 @@ BoxLayout:
 '''
 
 
-class FaceImage(ImageFromData):
+class FaceImage(FigureCanvas):
     dataset = ObjectProperty()
     image_index = NumericProperty(-1)
     pca_data = ObjectProperty(rebind=True)
     pca_components = NumericProperty()
 
     def __init__(self, **kwargs):
-        super(FaceImage, self).__init__(**kwargs)
+        fig, self.ax = plt.subplots()
+        super(FaceImage, self).__init__(fig, **kwargs)
+        self.ax.set_axis_off()
 
         self.bind(
-            dataset=self._redraw_graph,
-            image_index=self._redraw_graph,
-            pca_components=self._redraw_graph,
-            pca_data=self._redraw_graph
+            dataset=self.plot_image,
+            image_index=self.plot_image,
+            pca_components=self.plot_image,
+            pca_data=self.plot_image
         )
 
-    def check_value(self, value):
-        return value is not None and self.dataset is not None and self.image_index >= 0
+    def plot_image(self, instance, value):
+        if value is None or self.dataset is None or self.image_index < 0:
+            return
 
-    def get_image_data(self):
         image_size = self.dataset.images.shape[1:]
         image = self.dataset.images[self.image_index]
 
@@ -141,39 +137,46 @@ class FaceImage(ImageFromData):
 
             image = self.pca_data.reconstruct(image.flatten(), self.pca_components).reshape(image_size)
 
-        return image
+        self.ax.imshow(image)
+        self.draw()
 
 
-class PCAGraph(Graph):
+class PCAGraph(FigureCanvas):
     maximum_pca_components = NumericProperty()
     pca_components = NumericProperty()
-    pca_data = ObjectProperty(rebind=True)
+    pca_data = ObjectProperty()
 
     def __init__(self, **kwargs):
-        super(PCAGraph, self).__init__(**kwargs)
+        fig, ax = plt.subplots()
+        super(PCAGraph, self).__init__(fig, **kwargs)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
+        self.ax = ax
 
         self.bind(
-            maximum_pca_components=self._redraw_graph,
-            pca_components=self._redraw_graph,
-            pca_data=self._redraw_graph
+            maximum_pca_components=self.plot_pca_variance,
+            pca_components=self.plot_pca_variance,
+            pca_data=self.plot_pca_variance
         )
 
-    def check_value(self, value):
-        if value is None or self.pca_data is None or self.maximum_pca_components == 0 or self.pca_components == 0:
-            return False
+    def plot_pca_variance(self, instance, value):
+        if value is None \
+                or self.pca_data is None \
+                or self.maximum_pca_components < 0 \
+                or self.pca_components < 0 \
+                or self.pca_data.explained_variance.shape[0] != self.maximum_pca_components \
+                or self.pca_components >= self.maximum_pca_components:
+            return
 
-        if self.pca_data.explained_variance.shape[
-            0] != self.maximum_pca_components or self.pca_components >= self.maximum_pca_components:
-            return False
-
-        Logger.info("Updating PCA graph for max %d with %s at %d" % (
+        Logger.debug("Updating PCA graph for max %d with %s at %d" % (
             self.maximum_pca_components, str(self.pca_data.explained_variance.shape), self.pca_components))
 
-        return True
-
-    def draw_graph(self, ax):
+        ax = self.ax
+        ax.cla()
         v = self.pca_data.explained_variance.cumsum()
-        ax.plot(arange(self.maximum_pca_components), v, color='white', linewidth=5)
+        ax.plot(arange(self.maximum_pca_components), v)
 
         ax.set_xlabel('Number of Components')
         ax.set_ylabel('Total Explained Variance')
@@ -186,6 +189,7 @@ class PCAGraph(Graph):
             ax.axvline(self.pca_components, color='blue', linewidth=3)
         except LinAlgError:
             pass
+        self.draw()
 
 
 class RunPCA(Screen):

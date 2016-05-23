@@ -2,6 +2,18 @@ import kivy
 
 kivy.require('1.8.0')
 
+import matplotlib
+
+matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
+matplotlib.rc('figure', facecolor='black')
+matplotlib.rc('lines', color='white', linewidth=3)
+matplotlib.rc('axes', facecolor='black', labelcolor='white', edgecolor='white')
+matplotlib.rc('xtick', color='white')
+matplotlib.rc('ytick', color='white')
+matplotlib.rc('legend', fontsize='small')
+matplotlib.rc('text', color='white')
+matplotlib.rc('image', interpolation='none', cmap='gray', aspect='auto')
+
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
 from kivy.properties import OptionProperty, BoundedNumericProperty, AliasProperty
@@ -42,16 +54,16 @@ class NeuralNetworkDemoApp(App):
     pca_components = BoundedNumericProperty(10, min=1)
 
     # PCA transformed data
-    pca_data = AliasProperty(lambda self: PCAData(self.dataset), None, bind=['dataset'])
+    pca_data = AliasProperty(lambda self: PCAData(self.dataset.data), None, bind=['dataset'])
 
     # train inputs
     num_hidden_units = BoundedNumericProperty(10, min=1)
     num_valid_input = BoundedNumericProperty(0, min=0)
-    num_test_data = BoundedNumericProperty(0, min=0)
+    num_test_data = BoundedNumericProperty(0.2, min=0, max=1.0)
     hidden_units_learning_rate = BoundedNumericProperty(0.1, min=0.001, max=1.0)
     output_units_learning_rate = BoundedNumericProperty(0.2, min=0.001, max=1.0)
     momentum = BoundedNumericProperty(0.2, min=0, max=1.0)
-    epochs = BoundedNumericProperty(100, min=1, max=5000)
+    epochs = BoundedNumericProperty(100, min=1, max=10000)
     minimum_rmse = BoundedNumericProperty(0, min=0.0, max=1.0)
 
     # the categories of training

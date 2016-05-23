@@ -1,16 +1,17 @@
 import threading
 
+import matplotlib.pyplot as plt
 from kivy.app import App
 from kivy.clock import mainthread
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas
 from kivy.lang import Builder
 from kivy.logger import Logger
-from kivy.properties import NumericProperty
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from numpy import *
 
-from graph import Graph
+from neural_network import NeuralNetwork
 
 kv = '''
 BoxLayout:
@@ -43,8 +44,6 @@ BoxLayout:
         TrainingGraph:
             id: training_graph
             size_hint: (.6, 1)
-            epochs: app.epochs
-            minimum_rmse: app.minimum_rmse
 
     ScrollView:
         size_hint: (1, .6)
@@ -75,13 +74,10 @@ BoxLayout:
 '''
 
 
-class TrainingGraph(Graph):
-    epochs = NumericProperty()
-    minimum_rmse = NumericProperty(0.0)
-    epoch = NumericProperty()
-
+class TrainingGraph(FigureCanvas):
     def __init__(self, **kwargs):
-        super(TrainingGraph, self).__init__(**kwargs)
+        fig, self.axs = plt.subplots(2, sharex=True)
+        super(TrainingGraph, self).__init__(fig, **kwargs)
         self.rmse = None
         self.cerr = None
 
@@ -89,27 +85,36 @@ class TrainingGraph(Graph):
         return True
 
     @mainthread
-    def redraw(self, instance):
-        self._redraw_graph(instance, None)
-
-    def draw_graph(self, ax):
-        self.epoch = len(self.rmse)
-        if self.epoch < 1:
+    def plot(self, epoch, epochs, rmse, cerr, minimum_rmse):
+        if epoch < 1:
             return
 
-        ax.plot(arange(self.epoch), self.rmse, color='blue', linewidth=3)
-        ax.plot(arange(self.epoch), self.cerr, color='red', linewidth=3)
-        ax.legend(['RMSE', 'CErr'])
+        for ax in self.axs:
+            ax.cla()
+        ax1, ax2 = self.axs
 
-        ax.set_xlabel('Epochs')
-        ax.set_ylabel('RMSE')
-        ax.set_ylim([0, 1.0])
-
+        ax1.plot(arange(epoch), rmse[:, 0], label='Test', color='blue', ls="-")
+        ax1.plot(arange(epoch), rmse[:, 1], label='Train', color='blue', ls="--")
+        ax1.set_ylabel('RMSE')
+        ax1.set_ylim([0, 2.0])
+        ax1.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                   ncol=2, mode="expand", borderaxespad=0.)
         # TODO: figure out whether to use number of epochs or minimum rmse
-        if self.epochs > 0:
-            ax.set_xlim([0, self.epochs])
-        else:
-            ax.axhline(self.minimum_rmse, color='blue', linewidth=1, linestyle='--')
+        if minimum_rmse > 0:
+            ax1.axhline(self.minimum_rmse, color='blue', linewidth=1, linestyle='--')
+
+        ax2.plot(arange(epoch), cerr[:, 0], color='white', ls="-")
+        ax2.plot(arange(epoch), cerr[:, 1], color='white', ls="--")
+        ax2.set_ylabel('Class. Err')
+        ax2.set_ylim([0, 1.0])
+
+        for ax in self.axs:
+            ax.set_xlabel('Epochs')
+            ax.set_xlim([0, epochs])
+            ax.get_xaxis().tick_bottom()
+            ax.get_yaxis().tick_left()
+
+        self.draw()
 
 
 class TrainingResult(Screen):
@@ -118,6 +123,9 @@ class TrainingResult(Screen):
         contents = Builder.load_string(kv)
         self.add_widget(contents)
         self.ids = contents.ids
+
+        # Bind the network
+        self.network = NeuralNetwork(App.get_running_app())
 
         # Sample content
         grid = self.ids.result_grid
@@ -139,59 +147,49 @@ class TrainingResult(Screen):
 
         # Bind the buttons
         def back_pressed(instance):
-            self._pause_training(instance)
+            self.pause_training(instance)
             App.get_running_app().go_back()
+
         self.ids.back_button.bind(on_press=back_pressed)
 
         # Start the training thread when the screen is displayed
-        self.bind(on_enter=self._start_training)
+        self.bind(on_enter=self.start_training)
 
     # Manage network training
-    def _start_training(self, instance):
+    def start_training(self, instance):
         Logger.info('Starting training')
-        # Reset the epochs
-        self.ids.training_graph.epoch = 0
-        self._resume_training(self)
+        self.network.reset_training()
+        self.resume_training(self)
 
-    def _resume_training(self, instance):
+    def resume_training(self, instance):
         Logger.info('Resuming training')
-        self.pause_training = False
+        self.training_paused = False
         pause_button = self.ids.pause_button
         pause_button.text = 'Pause'
-        pause_button.unbind(on_press=self._resume_training)
-        pause_button.bind(on_press=self._pause_training)
+        pause_button.unbind(on_press=self.resume_training)
+        pause_button.bind(on_press=self.pause_training)
 
         # Make sure the thread stops on application exit
-        App.get_running_app().unbind(on_stop=self._pause_training)
-        App.get_running_app().bind(on_stop=self._pause_training)
+        App.get_running_app().unbind(on_stop=self.pause_training)
+        App.get_running_app().bind(on_stop=self.pause_training)
 
-        threading.Thread(target=self._do_train).start()
+        threading.Thread(target=self._run_training).start()
 
-    def _pause_training(self, instance):
-        self.pause_training = True
+    def pause_training(self, instance):
+        self.training_paused = True
         pause_button = self.ids.pause_button
         pause_button.text = 'Resume'
-        pause_button.unbind(on_press=self._pause_training)
-        pause_button.bind(on_press=self._resume_training)
+        pause_button.unbind(on_press=self.pause_training)
+        pause_button.bind(on_press=self.resume_training)
 
-    def _do_train(self):
-        app = App.get_running_app()
+    def _run_training(self):
         graph = self.ids.training_graph
+        for epoch, epochs, rmse, cerr, is_last in self.network.resume_training():
+            if (epoch % 10) == 1 or is_last:
+                Logger.info('epoch: %d, rmse shape: %s' % (epoch, str(rmse.shape)))
+                graph.plot(epoch, epochs, rmse, cerr, self.network.minimum_rmse)
 
-        import time
-        from numpy import exp
-        epoch = graph.epoch
-        while epoch < app.epochs:
-            if self.pause_training:
+            if self.training_paused:
                 break
-            time.sleep(1)
 
-            xs = arange(epoch) / 5.0
-            rmse = exp(-xs)
-            cerr = 0.5 * (exp(-xs))
-            graph.rmse = rmse
-            graph.cerr = cerr
-            graph.redraw(self)
-
-            epoch += 1
         Logger.info('Exit training thread')

@@ -189,8 +189,8 @@ FloatLayout:
     Slider:
         pos: (525, 212)
         size_hint: (.3, .1)
-        min: 1
-        max: 100
+        min: 0
+        max: 10000
         value: app.epochs
         on_value: app.epochs = self.value
 
