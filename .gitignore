@@ -62,6 +62,9 @@ target/
 # Buildozer
 .buildozer
 
+# VirtualEnv
+venv
+
 *un~
 .swp
 .py~
