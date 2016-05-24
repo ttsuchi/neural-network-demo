@@ -121,10 +121,10 @@ class PCAFaceImage(Image):
         if value is None or self.dataset is None or self.index < 0:
             return
 
-        _, height, width = self.dataset.images.shape
+        _, height, width = self.dataset['images'].shape
         self.texture = Texture.create(size=(width, height), colorfmt='luminance')
 
-        image_data = self.dataset.images[self.index]
+        image_data = self.dataset['images'][self.index]
         if self.pca_transformer is not None:
             if len(self.pca_transformer.mean_) != len(image_data.flatten()):
                 return

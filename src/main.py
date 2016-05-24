@@ -48,10 +48,10 @@ class NeuralNetworkDemoApp(App):
         return NeuralNetworkDemoApp.dataset_cache[self.dataset_name]
 
     dataset = AliasProperty(_load_dataset, None, bind=['dataset_name'])
-    maximum_pca_components = AliasProperty(lambda self: min(self.dataset.data.shape), None, bind=['dataset'])
+    maximum_pca_components = AliasProperty(lambda self: min(self.dataset['data'].shape), None, bind=['dataset'])
 
     # PCA transformed data
-    pca_data = AliasProperty(lambda self: PCAData(self.dataset.data), None, bind=['dataset'])
+    pca_data = AliasProperty(lambda self: PCAData(self.dataset['data']), None, bind=['dataset'])
 
     # PCA components (the max will be controlled by the maximum_pca_components)
     pca_components = BoundedNumericProperty(10, min=1)

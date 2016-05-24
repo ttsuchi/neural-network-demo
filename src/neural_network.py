@@ -99,7 +99,7 @@ class NeuralNetwork(object):
         self.hidden_units_learning_rate = app.hidden_units_learning_rate
         self.output_units_learning_rate = app.output_units_learning_rate
 
-        self.X = X = app.dataset.data
+        self.X = X = app.dataset['data']
         # Split into training and test
         X_train, X_test, self.y_train, self.y_test, self.idx_test = \
             _train_test_split(X, self.targets, test_size=app.num_test_data)
@@ -186,4 +186,4 @@ class NeuralNetwork(object):
         hidden_expected = dot(self._inverse_activation(outputs), pinv(self.W_output))[:, :-1]
         hidden_reconstruction = self.pca_transformer.inverse_transform(
             dot(self._inverse_activation(hidden_expected), pinv(self.W_hidden))[:, :-1])
-        return outputs.argmax(axis=1), hidden_reconstruction.reshape(self.app.dataset.images.shape)
+        return outputs.argmax(axis=1), hidden_reconstruction.reshape(self.app.dataset['images'].shape)

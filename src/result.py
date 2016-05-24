@@ -212,7 +212,7 @@ class TrainingResult(Screen):
         predictions, reconstructions = self.network.predict_all()
         predictions_correct = predictions == self.network.targets
         for is_test, image, reconstruction, prediction, target, prediction_correct in \
-                zip(self.network.idx_test, self.network.app.dataset.images, reconstructions, predictions,
+                zip(self.network.idx_test, self.network.app.dataset['images'], reconstructions, predictions,
                     self.network.targets, predictions_correct):
             # First column: Actual image
             grid.add_widget(ResultImage(image))
