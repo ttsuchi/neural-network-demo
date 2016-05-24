@@ -52,7 +52,7 @@ FloatLayout:
         text: str(app.num_hidden_units)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .65}
-        on_text_validate: app.num_hidden_units = int(self.value)
+        on_text: app.num_hidden_units = int(round(float(self.text)))
     Label:
         pos_hint: {'x': .05, 'center_y': .65}
         text: '# hidden units'
@@ -73,7 +73,7 @@ FloatLayout:
         text: str(app.num_valid_input)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .55}
-        on_text_validate: app.num_valid_input = int(self.value)
+        on_text: app.num_valid_input = int(round(float(self.text)))
     Label:
         pos_hint: {'x': .05, 'center_y': .55}
         text: '# validations'
@@ -92,7 +92,7 @@ FloatLayout:
         text: str(app.num_test_data)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .45}
-        on_text_validate: app.num_test_data = int(self.value)
+        on_text: app.num_test_data = int(round(float(self.text)))
     Label:
         pos_hint: {'x': .05, 'center_y': .45}
         text: '# test data'
@@ -111,7 +111,7 @@ FloatLayout:
         text: str(app.hidden_units_learning_rate)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .34}
-        on_text_validate: app.hidden_units_learning_rate = float(self.value)
+        on_text: app.hidden_units_learning_rate = round(float(self.text), 3)
     Label:
         pos_hint: {'x': .05, 'center_y': .36}
         text: 'hidden units'
@@ -135,7 +135,7 @@ FloatLayout:
         text: str(app.output_units_learning_rate)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .65}
-        on_text_validate: app.output_units_learning_rate = float(self.value)
+        on_text: app.output_units_learning_rate = round(float(self.text), 3)
     Label:
         pos_hint: {'x': .65, 'center_y': .66}
         text: 'output units'
@@ -158,7 +158,7 @@ FloatLayout:
         text: str(app.momentum)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .55}
-        on_text_validate: app.momentum = float(self.value)
+        on_text: app.momentum = round(float(self.text), 3)
     Label:
         pos_hint: {'x': .65, 'center_y': .55}
         text: 'momentum rate'
@@ -176,7 +176,7 @@ FloatLayout:
         text: str(app.epochs)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .45}
-        on_text_validate: app.epochs = int(self.value)
+        on_text: app.epochs = int(round(float(self.text)))
     Label:
         pos_hint: {'x': .65, 'center_y': .46}
         text: '# of epochs'
@@ -200,7 +200,7 @@ FloatLayout:
         text: str(app.minimum_rmse)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .35}
-        on_text_validate: app.minimum_rmse = int(self.value)
+        on_text: app.minimum_rmse = int(round(float(self.text)))
     Label:
         pos_hint: {'x': .65, 'center_y': .35}
         text: 'or minimum RMSE'

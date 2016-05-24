@@ -71,3 +71,5 @@ target/
 *.swp
 .pca.py.swp
 *.swp
+get-pip.py
+*.whl
