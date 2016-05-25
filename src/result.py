@@ -47,36 +47,41 @@ BoxLayout:
             id: training_graph
             size_hint: (.6, 1)
 
+
+    GridLayout:
+        id: table_header
+        disabled: True
+        cols: 1
+        spacing: 15
+        row_force_default: True
+        row_default_height: 50
+        size_hint_y: None
+        height: self.minimum_height
+
+        Label:
+            text: '      Actual Image                              Network Image                      Guess               Answer             Correct?'
+
     ScrollView:
         id: result_scrollview
         disabled: True
-        size_hint: (1, .6)
+        size_hint: (1, .55)
         do_scroll_x: False
         do_scroll_y: True
         scroll_type: ['bars', 'content']
-        bar_width: 10
+        bar_width: 20
         bar_color: [1, 1, 1, 1]
         bar_inactive_color: [1, 1, 1, 1]
+        scroll_wheel_distance: 50
 
         GridLayout:
             id: result_grid
             cols: 5
             spacing: 15
             row_force_default: True
-            row_default_height: 75
+            row_default_height: 50
             size_hint_y: None
             height: self.minimum_height
 
-            Label:
-                text: 'Actual Image'
-            Label:
-                text: 'Network Image'
-            Label:
-                text: 'Network Portrayal'
-            Label:
-                text: 'Actual Portrayal'
-            Label:
-                text: 'Correct?'
 '''
 
 
@@ -232,6 +237,7 @@ class TrainingResult(Screen):
             grid.add_widget(Label(text='%d' % prediction_correct, size_hint=(.5, .5)))
 
         self.ids.result_scrollview.disabled = False
+        self.ids.table_header.disabled = False
 
     def _run_training(self):
         graph = self.ids.training_graph
