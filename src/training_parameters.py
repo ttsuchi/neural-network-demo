@@ -92,7 +92,7 @@ FloatLayout:
         text: str(app.num_test_data)
         size_hint: (.07, .05)
         pos_hint: {'x': .3, 'center_y': .45}
-        on_text: app.num_test_data = int(round(float(self.text)))
+        on_text: app.num_test_data = round(float(self.text), 3)
     Label:
         pos_hint: {'x': .05, 'center_y': .45}
         text: '# test data'
@@ -101,8 +101,8 @@ FloatLayout:
     Slider:
         pos: (30, 212)
         size_hint: (.3, .1)
-        min: 1
-        max: 100
+        min: 0.0
+        max: 1.0
         value: app.num_test_data
         on_value: app.num_test_data = self.value
 
@@ -171,12 +171,36 @@ FloatLayout:
         value: app.momentum
         on_value: app.momentum = self.value
 
+    ToggleButton:
+        pos_hint: {'x': .63, 'center_y': .45}
+        on_press: 
+            rmse_slider.value = 0
+            app.training_target = 'epochs'
+            epochs_slider.value = 1000
+        state: 'down' if app.training_target == 'epochs' else 'normal'
+        size_hint: (.02, .02)
+        group: 'training target'
+        allow_no_selection: False
+
+    ToggleButton:
+        pos_hint: {'x': .63, 'center_y': .35}
+        on_press:
+            epochs_slider.value = 1
+            app.training_target = 'rmse'
+            rmse_slider.value = 0.2
+        state: 'down' if app.training_target == 'rmse' else 'normal'
+        size_hint: (.02, .02)
+        group: 'training target'
+        allow_no_selection: False
 
     TextInput:
         text: str(app.epochs)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .45}
-        on_text: app.epochs = int(round(float(self.text)))
+        on_text: 
+            app.epochs = int(round(float(self.text)))
+            rmse_slider.value = 0
+            app.training_target = 'epochs'
     Label:
         pos_hint: {'x': .65, 'center_y': .46}
         text: '# of epochs'
@@ -187,12 +211,16 @@ FloatLayout:
         size_hint: (.2, .1)
 
     Slider:
+        id: epochs_slider
         pos: (525, 212)
         size_hint: (.3, .1)
         min: 0
         max: 10000
         value: app.epochs
-        on_value: app.epochs = self.value
+        on_value: 
+            app.epochs = self.value
+            rmse_slider.value = 0
+            app.training_target = 'epochs'
 
 
 
@@ -200,19 +228,26 @@ FloatLayout:
         text: str(app.minimum_rmse)
         size_hint: (.07, .05)
         pos_hint: {'x': .9, 'center_y': .35}
-        on_text: app.minimum_rmse = int(round(float(self.text)))
+        on_text: 
+            app.minimum_rmse = round(float(self.text), 3)
+            epochs_slider.value = 1
+            app.training_target = 'rmse'
     Label:
         pos_hint: {'x': .65, 'center_y': .35}
         text: 'or minimum RMSE'
         size_hint: (.2, .1)
 
     Slider:
+        id: rmse_slider
         pos: (525, 147)
         size_hint: (.3, .1)
-        min: 1
-        max: 100
+        min: 0.0
+        max: 1.0
         value: app.minimum_rmse
-        on_value: app.minimum_rmse = self.value
+        on_value: 
+            app.minimum_rmse = self.value
+            epochs_slider.value = 1
+            app.training_target = 'rmse'
 '''
 
 

@@ -72,6 +72,7 @@ class NeuralNetworkDemoApp(App):
 
     # the categories of training
     target_name = OptionProperty('Expression', options=['Gender', 'Expression', 'Identity'])
+    training_target = OptionProperty('epochs', options=['epochs', 'rmse'])
 
     #
     # Main Kivy code for building the application UI.
