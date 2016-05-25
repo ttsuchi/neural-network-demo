@@ -3,37 +3,18 @@ from kivy.uix.screenmanager import Screen
 
 kv = '''
 FloatLayout:
-
-    ToggleButton:
-        text: 'Train for Gender'
-        pos_hint: {'x':.1, 'center_y': .83}
-        on_press: app.target_name = 'Gender'
-        state: 'down' if app.target_name == 'Gender' else 'normal'
+    
+    Spinner:
+        text: 'Expression'
+        values: 'Expression', 'Gender', 'Identity'
         size_hint: (.2, .1)
-        group: 'training'
-        allow_no_selection: False
+        pos_hint: {'x':.63, 'center_y': .83}
+        on_text: app.target_name = self.text
 
-
-    ToggleButton:
-        text: 'Train for Expression'
-        pos_hint: {'x': .4, 'center_y': .83}
-        on_press: app.target_name = 'Expression'
-        state: 'down' if app.target_name == 'Expression' else 'normal'
-        size_hint: (.2, .1)
-        group: 'training'
-        allow_no_selection: False
-
-
-    ToggleButton:
-        text: 'Train for Identity'
-        pos_hint: {'center_x': .8, 'center_y': .83}
-        on_press: app.target_name = 'Identity'
-        state: 'down' if app.target_name == 'Identity' else 'normal'
-        size_hint: (.2, .1)
-        group: 'training'
-        allow_no_selection: False
-
-
+    Label: 
+        text: 'Please select a training target: '
+        font_size: 25
+        pos_hint: {'x':-.1, 'center_y': .83}
 
     Button:
         text: 'Train'
