@@ -55,6 +55,8 @@ BoxLayout:
         do_scroll_y: True
         scroll_type: ['bars', 'content']
         bar_width: 10
+        bar_color: [1, 1, 1, 1]
+        bar_inactive_color: [1, 1, 1, 1]
 
         GridLayout:
             id: result_grid
