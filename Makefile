@@ -2,3 +2,10 @@
 
 clean:
 	rm -f *~ .*.*.*~ .*.*.swo .*.*.swp
+
+osx:
+    buildozer osx debug
+
+ios:
+    buildozer ios debug
+

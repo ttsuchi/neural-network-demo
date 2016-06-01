@@ -1,18 +1,6 @@
 import kivy
 
-kivy.require('1.8.0')
-
-import matplotlib
-
-matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
-matplotlib.rc('figure', facecolor='black')
-matplotlib.rc('lines', color='white', linewidth=3)
-matplotlib.rc('axes', facecolor='black', labelcolor='white', edgecolor='white')
-matplotlib.rc('xtick', color='white')
-matplotlib.rc('ytick', color='white')
-matplotlib.rc('legend', fontsize='small')
-matplotlib.rc('text', color='white')
-matplotlib.rc('image', interpolation='none', cmap='gray', aspect='auto')
+kivy.require('1.9.1')
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager

@@ -61,8 +61,8 @@ class PCAData(object):
 class PCATransformer(object):
     def __init__(self, pca_data, pca_components):
         self.mean_ = pca_data.mean_
-        self.V = pca_data.V[:pca_components]
-        self.explained_variance_ = pca_data.explained_variance_[:pca_components]
+        self.V = pca_data.V[:int(pca_components)]
+        self.explained_variance_ = pca_data.explained_variance_[:int(pca_components)]
 
     def transform(self, X):
         return dot(X - self.mean_, self.V.T) / sqrt(self.explained_variance_)
@@ -91,7 +91,7 @@ class NeuralNetwork(object):
             self.target_names = dict([(t + 1, str(t + 1)) for t in unique(self.targets)])
 
         self.n_output = len(unique(self.targets))
-        self.V_hidden = zeros((app.pca_components + 1, app.num_hidden_units))
+        self.V_hidden = zeros((int(app.pca_components) + 1, app.num_hidden_units))
         self.W_hidden = random_sample(self.V_hidden.shape)
         self.V_output = zeros((app.num_hidden_units + 1, self.n_output))
         self.W_output = random_sample(self.V_output.shape)
@@ -105,7 +105,7 @@ class NeuralNetwork(object):
             _train_test_split(X, self.targets, test_size=app.num_test_data)
 
         # Preprocess the data using PCA
-        self.pca_transformer = PCATransformer(PCAData(X_train), app.pca_components)
+        self.pca_transformer = PCATransformer(PCAData(X_train), int(app.pca_components))
         self.X_train = self.pca_transformer.transform(X_train)
         self.X_test = self.pca_transformer.transform(X_test)
 

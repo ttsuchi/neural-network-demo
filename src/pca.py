@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
-from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas
+from kivy.clock import mainthread
+from kivy.garden.graph import Graph, LinePlot
 from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.logger import Logger
@@ -77,10 +77,23 @@ BoxLayout:
         PCAGraph:
             size_hint: (0.65, 1)
             id: pca_graph
-            padding: 5
             pca_data: app.pca_data
             maximum_pca_components: app.maximum_pca_components
             pca_components: app.pca_components
+            padding: 5
+            xlabel: 'Number of Components'
+            xmin: 0
+            xmax: app.maximum_pca_components
+            x_ticks_minor: 5
+            x_ticks_major: 25
+            x_grid: True
+            x_grid_label: True
+            ylabel: 'Total Explained Variance'
+            ymin: 0
+            ymax: 1.0
+            y_ticks_major: .25
+            y_grid: True
+            y_grid_label: True
 
     BoxLayout:
         size_hint: (1, .15)
@@ -130,30 +143,31 @@ class PCAFaceImage(Image):
                 return
             image_data = self.pca_transformer.reconstruct(image_data)
 
-        self.texture.blit_buffer((image_data[::-1] * 255).astype(ubyte).tostring(), colorfmt='luminance', bufferfmt='ubyte')
+        self.texture.blit_buffer((image_data[::-1] * 255).astype(ubyte).tostring(), colorfmt='luminance',
+                                 bufferfmt='ubyte')
         self.canvas.ask_update()
 
 
-class PCAGraph(FigureCanvas):
+class PCAGraph(Graph):
     maximum_pca_components = NumericProperty()
     pca_components = NumericProperty()
     pca_data = ObjectProperty()
 
     def __init__(self, **kwargs):
-        fig, ax = plt.subplots()
-        super(PCAGraph, self).__init__(fig, **kwargs)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.get_xaxis().tick_bottom()
-        ax.get_yaxis().tick_left()
-        self.ax = ax
+        self._with_stencilbuffer = False # See https://github.com/kivy-garden/garden.graph/issues/7
+        super(PCAGraph, self).__init__(**kwargs)
+        self.pca_plot = LinePlot(color=[1, 1, 1, 1], line_width=3)
+        self.vline = LinePlot(color=[0, 0, 1, 1], line_width=2)
+        self.hline = LinePlot(color=[0, 0, 1, 1], line_width=2)
+        [self.add_plot(p) for p in (self.pca_plot, self.vline, self.hline)]
 
         self.bind(
             maximum_pca_components=self.plot_pca_variance,
-            pca_components=self.plot_pca_variance,
-            pca_data=self.plot_pca_variance
+            pca_data=self.plot_pca_variance,
+            pca_components=self.plot_pca_components,
         )
 
+    @mainthread
     def plot_pca_variance(self, instance, value):
         if value is None \
                 or self.pca_data is None \
@@ -166,23 +180,26 @@ class PCAGraph(FigureCanvas):
         Logger.debug("Updating PCA graph for max %d with %s at %d" % (
             self.maximum_pca_components, str(self.pca_data.explained_variance.shape), self.pca_components))
 
-        ax = self.ax
-        ax.cla()
         v = self.pca_data.explained_variance.cumsum()
-        ax.plot(arange(self.maximum_pca_components), v)
+        self.pca_plot.points = [(float(x), float(y)) for (x, y) in zip(arange(self.maximum_pca_components), v)]
+        self.pca_plot.draw()
+        self.plot_pca_components(instance, value)
 
-        ax.set_xlabel('Number of Components')
-        ax.set_ylabel('Total Explained Variance')
-        ax.set_xlim([0, self.maximum_pca_components])
-        ax.set_ylim([0, 1.0])
-        ax.axhline(v[self.pca_components - 1], color='blue', linewidth=1)
+    @mainthread
+    def plot_pca_components(self, instance, value):
+        if value is None \
+                or self.pca_data is None \
+                or self.maximum_pca_components < 0 \
+                or self.pca_components < 0 \
+                or self.pca_data.explained_variance.shape[0] != self.maximum_pca_components \
+                or self.pca_components >= self.maximum_pca_components:
+            return
 
-        from numpy.linalg.linalg import LinAlgError
-        try:
-            ax.axvline(self.pca_components, color='blue', linewidth=3)
-        except LinAlgError:
-            pass
-        self.draw()
+        v = self.pca_data.explained_variance.cumsum()
+        x_, y_ = float(self.pca_components), float(v[int(self.pca_components - 1)])
+        self.vline.points = [(x_, 0.0), (x_, 1.0)]
+        self.hline.points = [(0, y_), (float(self.maximum_pca_components) - 1, y_)]
+        [p.draw() for p in (self.vline, self.hline)]
 
 
 class RunPCA(Screen):

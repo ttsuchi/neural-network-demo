@@ -1,11 +1,9 @@
 import threading
 
-import matplotlib.pyplot as plt
 from kivy.app import App
 from kivy.clock import mainthread
-from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas
+from kivy.garden.graph import Graph, LinePlot
 from kivy.graphics.texture import Texture
-from kivy.graphics.vertex_instructions import Rectangle
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.uix.label import Label
@@ -43,10 +41,40 @@ BoxLayout:
                         text: 'Pause'
                         size_hint: (.8, .5)
 
-        TrainingGraph:
-            id: training_graph
+        BoxLayout:
+            orientation: 'vertical'
             size_hint: (.6, 1)
+            TrainingGraph:
+                id: rmse_graph
+                padding: 3
+                xlabel: 'Epochs'
+                xmin: 0
+                xmax: app.epochs
+                x_ticks_major: 250
+                x_grid: True
+                x_grid_label: True
+                ylabel: 'RMSE'
+                ymin: 0
+                ymax: 2.0
+                y_ticks_major: .5
+                y_grid: True
+                y_grid_label: True
 
+            TrainingGraph:
+                id: cerr_graph
+                padding: 3
+                xlabel: 'Epochs'
+                xmin: 0
+                xmax: app.epochs
+                x_ticks_major: 250
+                x_grid: True
+                x_grid_label: True
+                ylabel: 'Cls.Err.'
+                ymin: 0
+                ymax: 1.0
+                y_ticks_major: .25
+                y_grid: True
+                y_grid_label: True
 
     GridLayout:
         id: table_header
@@ -85,47 +113,25 @@ BoxLayout:
 '''
 
 
-class TrainingGraph(FigureCanvas):
+class TrainingGraph(Graph):
     def __init__(self, **kwargs):
-        fig, self.axs = plt.subplots(2, sharex=True)
-        super(TrainingGraph, self).__init__(fig, **kwargs)
-        self.rmse = None
-        self.cerr = None
+        self._with_stencilbuffer = False  # See https://github.com/kivy-garden/garden.graph/issues/7
+        super(TrainingGraph, self).__init__(**kwargs)
+        self.train_plot = LinePlot(color=[0, 0, 1, 1], line_width=2)
+        self.test_plot = LinePlot(color=[1, 1, 1, 1], line_width=2)
+        [self.add_plot(p) for p in [self.train_plot, self.test_plot]]
 
     def check_value(self, value):
         return True
 
     @mainthread
-    def plot(self, epoch, epochs, rmse, cerr, minimum_rmse):
+    def plot(self, epoch, epochs, err, minimum_rmse):
         if epoch < 1:
             return
 
-        for ax in self.axs:
-            ax.cla()
-        ax1, ax2 = self.axs
-
-        ax1.plot(arange(epoch), rmse[:, 0], label='Test', color='blue', ls="-")
-        ax1.plot(arange(epoch), rmse[:, 1], label='Train', color='blue', ls="--")
-        ax1.set_ylabel('RMSE')
-        ax1.set_ylim([0, 2.0])
-        ax1.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                   ncol=2, mode="expand", borderaxespad=0.)
-        # TODO: figure out whether to use number of epochs or minimum rmse
-        if minimum_rmse > 0:
-            ax1.axhline(self.minimum_rmse, color='blue', linewidth=1, linestyle='--')
-
-        ax2.plot(arange(epoch), cerr[:, 0], color='white', ls="-")
-        ax2.plot(arange(epoch), cerr[:, 1], color='white', ls="--")
-        ax2.set_ylabel('Class. Err')
-        ax2.set_ylim([0, 1.0])
-
-        for ax in self.axs:
-            ax.set_xlabel('Epochs')
-            ax.set_xlim([0, epochs])
-            ax.get_xaxis().tick_bottom()
-            ax.get_yaxis().tick_left()
-
-        self.draw()
+        self.train_plot.points = [(float(x), float(y)) for x, y in zip(arange(epoch), err[:, 0])]
+        self.test_plot.points  = [(float(x), float(y)) for x, y in zip(arange(epoch), err[:, 1])]
+        [p.draw() for p in (self.train_plot, self.test_plot)]
 
 
 class ResultImage(Image):
@@ -146,24 +152,6 @@ class TrainingResult(Screen):
 
         # Bind the network
         self.network = NeuralNetwork(App.get_running_app())
-
-        # Sample content
-        # grid = self.ids.result_grid
-        # for j in range(157):
-        #     # First column: Actual image
-        #     grid.add_widget(Image(source='face1.png'))
-        #
-        #     # Second column: Network's image reconstruction
-        #     grid.add_widget(Image(source='face1.png'))
-        #
-        #     # Third column: Network Representation
-        #     grid.add_widget(Label(text='mad', size_hint=(.5, .5)))
-        #
-        #     # Fourth column: Actual representation
-        #     grid.add_widget(Label(text='happy', size_hint=(.5, .5)))
-        #
-        #     # Fifth column: correct/incorrect
-        #     grid.add_widget(Label(text='1', size_hint=(.5, .5)))
 
         # Bind the buttons
         def back_pressed(instance):
@@ -240,11 +228,11 @@ class TrainingResult(Screen):
         self.ids.table_header.disabled = False
 
     def _run_training(self):
-        graph = self.ids.training_graph
         for epoch, epochs, rmse, cerr, is_last in self.network.resume_training():
             if (epoch % 10) == 1 or is_last:
                 Logger.debug('epoch: %d, rmse shape: %s' % (epoch, str(rmse.shape)))
-                graph.plot(epoch, epochs, rmse, cerr, self.network.minimum_rmse)
+                self.ids.rmse_graph.plot(epoch, epochs, rmse, self.network.minimum_rmse)
+                self.ids.cerr_graph.plot(epoch, epochs, cerr, self.network.minimum_rmse)
 
             if self.training_paused:
                 break
