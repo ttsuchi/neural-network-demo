@@ -2,7 +2,7 @@ import threading
 
 from kivy.app import App
 from kivy.clock import mainthread
-from kivy.garden.graph import Graph, LinePlot
+from kivy_garden_graph import Graph, LinePlot
 from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.logger import Logger

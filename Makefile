@@ -7,5 +7,7 @@ osx:
     buildozer osx debug
 
 ios:
+	cd .buildozer/ios/platform/kivy-ios
+	./toolchain.py build kivy
     buildozer ios debug
 

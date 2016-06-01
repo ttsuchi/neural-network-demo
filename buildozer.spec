@@ -49,7 +49,7 @@ garden_requirements = graph
 #icon.filename = %(source.dir)s/data/icon.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
-orientation = landscape
+# orientation = landscape
 
 #
 # OSX Specific

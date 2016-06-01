@@ -13,3 +13,12 @@ Download kivy and follow the instructions from [here](https://kivy.org/#download
 kivy src/main.py
 ```
 
+### Building for iOS
+
+```
+.buildozer/ios/platform/kivy-ios
+./toolchain.py build kivy
+buildozer ios debug
+```
+
+Also follow the instructions from [here](https://github.com/kivy/kivy-ios/pull/108) to compile numpy.
